@@ -4,10 +4,14 @@ purpose: will act as a server for the portfolio website
 """
 # Dependencies
 from flask import Flask, render_template
+from flask_bootstrap import Bootstrap5
 
 # Internal Modules
-app = Flask(__name__)
 
+app = Flask(__name__)
+app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+
+Bootstrap5(app)
 
 # Methods------------------------------
 @app.route('/')

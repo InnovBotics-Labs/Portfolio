@@ -1,10 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-hi
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Prabhukumar Sivamoorthy {% endblock %}
+
+{% block content %}
+{% include 'nav_bar/nav_bar.html' %}
+{% include 'hero_page.html' %}
+<section class="py-5" id="prod">
+    <h1 class="just-center">Products</h1>
+  <div class="container">
+    {% include 'nav_bar/products.html' %}
+  </div>
+</section>
+
+<section class="py-5" id="Prof">
+    {% include 'profession/profession.html' %}
+</section>
+
+<section class="py-5" id="Project">
+  <div class="container">
+    {% include 'nav_bar/projects.html' %}
+  </div>
+</section>
+
+{% include 'footer_1.html' %}
+{% endblock %}
