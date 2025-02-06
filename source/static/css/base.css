@@ -1,0 +1,18 @@
+ /* Full Page Dark Green Gradient Background */
+        body {
+            background: linear-gradient(to bottom, #010d08, #01120b);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: url("{{ url_for('static', filename='hero-bg.jpg') }}") center/cover no-repeat;
+        }
