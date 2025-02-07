@@ -2,8 +2,8 @@
     <div class="container-fluid">
         <!-- Brand Logo & Name -->
         <a class="navbar-brand mb-0 h1 d-flex align-items-center" href="{{ url_for('home') }}">
-            <img alt="Logo" class="me-2" height="30" src="{{ url_for('static', filename='images/bootstrap-logo.svg') }}"/>
-            <span class="fw-bold">Prabhukumar Sivamoorthy</span>
+
+            <span class="fw-bold"><i class="fas fa-laptop-code me-2"></i>Prabhukumar Sivamoorthy</span>
         </a>
 
         <!-- Toggle Button for Mobile -->
@@ -79,4 +79,8 @@
 <div class="sliding-div" id="Projects">
     <button class="close-btn">&times;</button>
     {% include "nav_bar/projects.html" %}
+</div>
+<div class="sliding-div" id="Professional">
+    <button class="close-btn">&times;</button>
+    {% include "nav_bar/profession.html" %}
 </div>
