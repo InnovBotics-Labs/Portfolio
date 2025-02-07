@@ -8,6 +8,10 @@
     background: transparent !important;
 }
 
+.navbar-toggler-icon {
+    filter: invert(1)
+}
+
 /* Darker Navbar on Scroll */
 .navbar.solid {
     background: rgba(2, 26, 18, 0.95) !important;
