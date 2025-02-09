@@ -8,8 +8,8 @@ timeline-container {
     .timeline-line {
       position: relative;
       right: 10%;
-      top: 0;
-      bottom: 0;
+      top: 50px;
+      bottom: 10px;
       width: 8px;
       background: linear-gradient(to bottom, #007bff, #42a5f5);
       z-index: 1;
@@ -20,7 +20,7 @@ timeline-container {
       width: 45%;
       display: flex;
       align-items: center;
-      background: #fff;
+      background: #EEEEEE;
       border-radius: 16px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       margin: 5px 0px;
@@ -151,6 +151,11 @@ timeline-container {
       border-right-color: #007bff;
     }
 
+#header_ {
+    z-index: 10;
+    position: relative;
+    padding: 15px;
+}
 
 /* Responsive Design */
 @media (max-width: 768px) {
