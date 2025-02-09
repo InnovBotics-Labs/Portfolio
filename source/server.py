@@ -13,6 +13,7 @@ class MyForm(FlaskForm):
     f_name = StringField('First Name', validators=[DataRequired()])
     l_name = StringField('Last Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
+    subject = StringField('Subject', validators=[DataRequired()])
     message = StringField('Message', validators=[DataRequired()])
     submit = SubmitField(label="send")
 
