@@ -80,7 +80,7 @@
     left: 0;
     width: 100%; /* Full width */
     height: 100vh; /* Full height */
-    background: linear-gradient(to bottom, #010d08, #01120b); /* Same as body */
+    background: linear-gradient(300deg, rgba(10, 15, 31, 0.9), rgba(93, 0, 30, 0.9), rgba(139, 0, 0, 0.9));
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
     transition: top 1.0s ease-in-out;
     z-index: 1040; /* Below navbar */
