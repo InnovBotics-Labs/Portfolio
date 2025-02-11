@@ -10,6 +10,7 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 
 class MyForm(FlaskForm):
+    """ Contains list of entry variables"""
     f_name = StringField('First Name', validators=[DataRequired()])
     l_name = StringField('Last Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
