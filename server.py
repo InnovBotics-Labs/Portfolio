@@ -7,7 +7,7 @@ from flask import Flask, render_template,request
 from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired, Regexp, Optional
+from wtforms.validators import DataRequired, Regexp
 
 class MyForm(FlaskForm):
     """ Contains list of entry variables"""
@@ -15,7 +15,7 @@ class MyForm(FlaskForm):
     l_name = StringField('Last Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
     # Optional country code (e.g., +1, +91)
-    country_code = StringField('Country Code', validators=[Optional()], render_kw={"placeholder": "e.g., +1"})
+    country_code = StringField('Country Code', validators=[DataRequired()], render_kw={"placeholder": "e.g., +1"})
     phone = StringField('Phone', validators=[
         DataRequired(),
         Regexp(r'^\d{10}$', message="Phone number must be exactly 10 digits")
