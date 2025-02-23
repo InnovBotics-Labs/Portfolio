@@ -15,7 +15,9 @@ class MyForm(FlaskForm):
     l_name = StringField('Last Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
     # Optional country code (e.g., +1, +91)
-    country_code = StringField('Country Code', validators=[DataRequired()], render_kw={"placeholder": "e.g., +1"})
+    country_code = StringField('Country Code',
+                               validators=[DataRequired()],
+                               render_kw={"placeholder": "e.g., +1"})
     phone = StringField('Phone', validators=[
         DataRequired(),
         Regexp(r'^\d{10}$', message="Phone number must be exactly 10 digits")
