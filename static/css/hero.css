@@ -203,3 +203,13 @@
         }
 
 }
+
+.sub-heading{
+    font-size: 3rem;
+    font-weight: 600;
+    color: white
+    margin-bottom: 10px;
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: fadeInUp 1s forwards 0.3s;
+}
