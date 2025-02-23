@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Prabhukumar Sivamoorthy {% endblock %}
+{% block title %}Prabhukumar Sivamoorthy{% endblock %}
 
 {% block content %}
-<div id="particles-js"></div>
+
     {% include 'nav_bar/nav_bar.html' %}
  <!-- Hero Section -->
-    {% include 'hero/hero_section.html' %}
+    {% include 'section/hero_section.html' %}
 
     <!-- Other Sections (Example) -->
 <section id="Profession" class="mb-5">
@@ -14,7 +14,7 @@
 </section>
 
 <section id="contact">
- {% include "contact.html" %}
+ {% include "section/contact.html" %}
 </section>
- {% include "footer.html" %}
+
 {% endblock %}

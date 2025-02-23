@@ -3,7 +3,7 @@ AppName:Server
 purpose: will act as a server for the portfolio website
 """
 # Dependencies
-from flask import Flask, render_template,request
+from flask import Flask, render_template,request,send_from_directory
 from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField
@@ -52,6 +52,14 @@ def ping():
     print(data["phone"])
     print(data["message"])
     return render_template('send.html')
+
+@app.route('/download')
+def download():
+    return send_from_directory('static', path="assets/files/under-construction-sign.pdf")
+
+@app.route('/login')
+def login():
+    return render_template('Pages/login.html')
 
 # ------------------------------------------
 if __name__ == "__main__":
