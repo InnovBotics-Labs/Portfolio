@@ -3,20 +3,25 @@ AppName:Server
 purpose: will act as a server for the portfolio website
 """
 # Dependencies
-from flask import Flask, render_template
+from flask import Flask, render_template,request
 from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms import StringField, SubmitField, TextAreaField
+from wtforms.validators import DataRequired, Regexp, Optional
 
 class MyForm(FlaskForm):
     """ Contains list of entry variables"""
     f_name = StringField('First Name', validators=[DataRequired()])
     l_name = StringField('Last Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
-    subject = StringField('Subject', validators=[DataRequired()])
-    message = StringField('Message', validators=[DataRequired()])
-    submit = SubmitField(label="send")
+    # Optional country code (e.g., +1, +91)
+    country_code = StringField('Country Code', validators=[Optional()], render_kw={"placeholder": "e.g., +1"})
+    phone = StringField('Phone', validators=[
+        DataRequired(),
+        Regexp(r'^\d{10}$', message="Phone number must be exactly 10 digits")
+    ], render_kw={"placeholder": "1234567890"})
+    message = TextAreaField('Message', validators=[DataRequired()], render_kw={"rows": 5})
+    submit = SubmitField(label="📨 Send")
 
 # Internal Modules
 
@@ -36,11 +41,15 @@ def home() -> str:
     return render_template('index.html', form=ping_form)
 
 
-@app.route("/ping")
+@app.route("/ping", methods=["POST"])
 def ping():
     """Q & A form"""
-    ping_form = MyForm()
-    return render_template('contact.html', form=ping_form)
+    data = request.form
+    print(data["name"])
+    print(data["email"])
+    print(data["phone"])
+    print(data["message"])
+    return render_template('send.html')
 
 # ------------------------------------------
 if __name__ == "__main__":
