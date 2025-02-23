@@ -1,14 +1,20 @@
 <section class="hero">
     <!-- Background Animation -->
+    <div class="container">
+        <div class="row hero-inner">
+            <!-- Left Column: Flickering Image -->
+            <div class=" col-12 col-md-6">
+                <img src="{{url_for('static', filename='assets/Prabhu.png')}}" alt="Flicker Effect" class="flicker-image hero-image">
+            </div>
 
-
-    <!-- Hero Content -->
-    <div class="hero-content">
-        <h1> Welcome to Prabhu's Portfolio! 🎨✨ </h1>
-        <p>Building innovative solutions with technology</p>
-        <a class="btn hero-btn primary" href="#Projects">Download Resume</a>
-        <a class="btn hero-btn secondary" href="#contact">Get in Touch</a>
+            <!-- Right Column: Hero Content -->
+            <div class="col-12 col-md-6 hero-content">
+                <h1>Welcome to Prabhu's Portfolio!</h1>
+                <p>Building innovative solutions with technology</p>
+                <a class="btn hero-btn primary" href="#Projects">Download Resume</a>
+                <a class="btn hero-btn secondary" href="#contact">Get in Touch</a>
+            </div>
+        </div>
     </div>
-
 
 </section>

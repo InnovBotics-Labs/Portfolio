@@ -41,6 +41,10 @@
 .hero-content {
     z-index: 10;
     position: relative;
+    flex: 1;
+    text-align: left;
+    padding: 20px;
+    color: white;
 }
 
 /* Hero Title */
@@ -121,10 +125,81 @@
     }
 }
 
-#contact {
-  justify-content: center;
-  align-items: center;
-  height: 100vh; /* or another height as needed */
+/* Style for the flickering image */
+.flicker-image {
+    position: absolute; /* Adjust positioning as needed */
+    top: 10%;
+    left: 20%;
+    transform: translate(-50%, -50%);
+    width: 50%; /* Adjust size as needed */
+    height: auto;
+    z-index: 5; /* Ensure it's layered correctly relative to hero content */
+    animation: flicker 3s infinite;
+}
+
+/* Keyframes for the flickering effect */
+@keyframes flicker {
+    0%   { opacity: 1; }
+    10%  { opacity: 0.6; }
+    20%  { opacity: 1; }
+    30%  { opacity: 0.4; }
+    40%  { opacity: 1; }
+    50%  { opacity: 0.7; }
+    60%  { opacity: 1; }
+    70%  { opacity: 0.5; }
+    80%  { opacity: 1; }
+    90%  { opacity: 0.8; }
+    100% { opacity: 1; }
 }
 
 
+/* Container for the two-column layout */
+.hero-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative; /* Keeps stacking context with background animation */
+}
+
+
+/* Remove any custom flex properties that prevent wrapping */
+.hero-inner {
+    /* If you need to use flex, ensure it allows wrapping */
+    display: flex;
+    flex-wrap: wrap;
+    /* Remove or comment out any fixed flex-direction if not needed */
+    /* flex-direction: row; */
+}
+
+.hero-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* Optional: Force column stacking on smaller screens */
+@media (max-width: 768px) {
+    .hero-inner {
+        flex-direction: column !important;
+    }
+    .flicker-image {
+    position: relative; /* Adjust positioning as needed */
+    top: 30%;
+    left: 20%;
+    margin-top: 100px;
+    }
+
+    .hero-content {
+        text-align: center;
+    }
+    .hero-image{
+            top: 50%;
+    left: 50%;
+        }
+
+}
