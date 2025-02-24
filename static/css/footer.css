@@ -1,4 +1,6 @@
         .footer {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
             background: linear-gradient(300deg, #070a16, #4a0018, #6e0000);
             color: #fff;
             padding: 20px 0;

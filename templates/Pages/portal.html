@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Login/Register{% endblock %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+{% block content %}
+<section id="header_" style="padding-top:50%">
+   <div class="box" style="height:100vh">
+      <h1>Authentication Required</h1>
+      <!-- Hide the Login/Registration buttons for logged-in users -->
+      <button onclick="{{ url_for('login') }}" class="btn btn-warning btn-block btn-large"
+        >Login</button
+      >
+      <a
+        href="{{ url_for('register') }}"
+        class="btn btn-secondary btn-block btn-large"
+        >Register</a
+      >
+</div>
+</section>
+
+{% endblock %}

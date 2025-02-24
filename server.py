@@ -5,28 +5,11 @@ purpose: will act as a server for the portfolio website
 # Dependencies
 from flask import Flask, render_template,request,send_from_directory
 from flask_bootstrap import Bootstrap5
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired, Regexp
-
-class MyForm(FlaskForm):
-    """ Contains list of entry variables"""
-    f_name = StringField('First Name', validators=[DataRequired()])
-    l_name = StringField('Last Name', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired()])
-    # Optional country code (e.g., +1, +91)
-    country_code = StringField('Country Code',
-                               validators=[DataRequired()],
-                               render_kw={"placeholder": "e.g., +1"})
-    phone = StringField('Phone', validators=[
-        DataRequired(),
-        Regexp(r'^\d{10}$', message="Phone number must be exactly 10 digits")
-    ], render_kw={"placeholder": "1234567890"})
-    message = TextAreaField('Message', validators=[DataRequired()], render_kw={"rows": 5})
-    submit = SubmitField(label="📨 Send")
 
 # Internal Modules
+from tools.wt_forms import PingMeForm, RegisterForm
 
+# Global Declarations/Configurations
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 app.secret_key = "any-string-you-want-just-keep-it-secret"
@@ -39,7 +22,7 @@ def home() -> str:
     """
     Takes user to Homepage of the Server website
     """
-    ping_form = MyForm()
+    ping_form = PingMeForm()
     return render_template('index.html', form=ping_form)
 
 
@@ -57,9 +40,18 @@ def ping():
 def download():
     return send_from_directory('static', path="assets/files/under-construction-sign.pdf")
 
+@app.route('/portal')
+def portal():
+    return render_template('Pages/portal.html')
+
 @app.route('/login')
 def login():
     return render_template('Pages/login.html')
+
+@app.route('/register')
+def register():
+    register_form = RegisterForm()
+    return render_template('Pages/register.html', form = register_form)
 
 # ------------------------------------------
 if __name__ == "__main__":
