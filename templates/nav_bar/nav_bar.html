@@ -1,9 +1,9 @@
 <nav class="navbar navbar-expand-lg fixed-top transparent">
-    <div class="container-fluid">
+    <div class="container-fluid ">
         <!-- Brand Logo & Name -->
         <a class="navbar-brand mb-0 h1 d-flex align-items-center" href="{{ url_for('home') }}">
 
-            <span class="fw-bold"><i class="fas fa-laptop-code me-2"></i>Prabhukumar Sivamoorthy</span>
+            <span class="fw-bold"><i class="fas fa-laptop-code me-2"></i><u><b>P</b></u>rabhukumar <u><b>S</b></u>ivamoorthy</span>
         </a>
 
         <!-- Toggle Button for Mobile -->
@@ -16,24 +16,24 @@
             <ul class="navbar-nav justify-content-center flex-grow-1">
                 <li class="nav-item dropdown me-3 ms-3">
                     <a class="nav-link px-3 fw-semibold" href="#" onclick="showContent('Products')">
-                        <i class="fas fa-cubes"></i> <b>P</b>roducts</a>
+                        <i class="fas fa-cubes"></i> <b><u>P</u></b>roducts</a>
                 </li>
                 <li class="nav-item dropdown me-3 ms-3">
                     <a class="nav-link px-3 fw-semibold" href="#" onclick="showContent('Patents')">
-                        <i class="fas fa-lightbulb"></i> <b>P</b>atents</a>
+                        <i class="fas fa-lightbulb"></i> <b><u>P</u></b>atents</a>
                 </li>
                 <li class="nav-item dropdown me-3 ms-3">
                     <a class="nav-link px-3 fw-semibold" href="#" onclick="showContent('Published_Papers')">
-                        <i class="fas fa-file-alt"></i> <b>P</b>apers</a>
+                        <i class="fas fa-file-alt"></i> <b><u>P</u></b>apers</a>
                 </li>
                 <li class="nav-item me-3 ms-3">
                     <a class="nav-link px-3 fw-semibold" href="#" onclick="showContent('Projects')">
-                        <i class="fas fa-project-diagram"></i> <b>P</b>rojects
+                        <i class="fas fa-project-diagram"></i> <b><u>P</u></b>rojects
                     </a>
                 </li>
                 <li class="nav-item me-3 ms-3">
                     <a class="nav-link px-3 fw-semibold" href="#Profession">
-                        <i class="fas fa-briefcase"></i> <b>P</b>rofession
+                        <i class="fas fa-briefcase"></i> <b><u>P</u></b>rofession
                     </a>
                 </li>
             </ul>
@@ -42,22 +42,26 @@
             <ul class="navbar-nav ms-auto me-3 ms-3">
                 <li class="nav-item dropdown">
                     <a class="nav-link fw-semibold d-flex align-items-center me-3 ms-3" href="#contact">
-                        <i class="fas fa-envelope"></i><b> P</b>ing-me</a>
+                        <i class="fas fa-envelope"></i><b><u>P</u></b>ing-me</a>
                 </li>
                 <li class="nav-item me-3 ms-3">
                     <!-- Profile Dropdown -->
+                    {% if condition %}
                     <div class="dropdown">
                         <a class="nav-link text-white dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown" id="profileDropdown">
                             <img alt="Profile" class="rounded-circle me-2" height="40"
                                  src="{{url_for('static', filename='assets/Prabhu.png')}}" width="40">
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> <b>P</b>rofile</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i><b>P</b>references</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> <b><u>P</u></b>rofile</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i><b><u>P</u></b>references</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i><b>P</b>ortal Sign-off</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i><b><u>P</u></b>ortal Sign-off</a></li>
                         </ul>
                     </div>
+                    {% else %}
+                    <a class="btn hero-btn secondary" href="{{ url_for('portal') }}"><b><u>P</u></b>ortal</a>
+                    {% endif %}
                 </li>
             </ul>
         </div>

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Login/Register{% endblock %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+{% block content %}
+    <h4 >  <a class="navbar-brand mb-0 h1 d-flex align-items-center" href="{{ url_for('home') }}">
+
+            <span class="fw-bold"><i class="fas fa-laptop-code me-2"></i><u><b>P</b></u>rabhukumar <u><b>S</b></u>ivamoorthy</span>
+        </a> </h4>
+    <div class="box">
+    {{ render_form(form, novalidate=False) }}
+    <div>
+
+{% endblock %}
