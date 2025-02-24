@@ -16,9 +16,8 @@ class UserInfo(User):
     f_name = StringField('First Name', validators=[DataRequired()])
     l_name = StringField('Last Name', validators=[DataRequired()])
 
-
 class PingMeForm(UserInfo):
-    """Contains parameters that needs few more forms"""
+    """Contains parameters that need few more forms"""
     country_code = StringField('Country Code',
                                validators=[DataRequired()],
                                render_kw={"placeholder": "e.g., +1"})
@@ -30,5 +29,11 @@ class PingMeForm(UserInfo):
     submit = SubmitField(label="📨 Send")
 
 class RegisterForm(UserInfo):
+    """ Contains the elements of Registration form"""
     password = PasswordField("Password",validators=[DataRequired()])
     register = SubmitField(label="Register")
+
+class LoginForm(User):
+    """ Contains the elements of Registration form"""
+    password = PasswordField("Password", validators=[DataRequired()])
+    login = SubmitField(label="Login")
