@@ -9,7 +9,7 @@ from werkzeug.utils import redirect
 
 # Internal Modules
 from tools.wt_forms import PingMeForm, RegisterForm, LoginForm
-from tools.data_model import read_all_records, create_new_record, init_db,Inquirer
+from tools.data_model import read_all_records, create_record, init_db,Inquirer
 
 
 # Global Declarations/Configurations
@@ -47,14 +47,14 @@ def ping():
             message=data["message"]
         )
 
-        create_new_record(new_inquirer)
+        create_record(new_inquirer)
         return redirect(url_for('inquirer'))
     return redirect(url_for('home'))
 
 @app.route('/inquirer')
 def inquirer():
     """Downloads the resumes"""
-    inquirers = read_all_records()
+    inquirers = read_all_records(Inquirer)
     return render_template('Pages/inquirer.html', inquirers=inquirers)
 
 @app.route('/download')
