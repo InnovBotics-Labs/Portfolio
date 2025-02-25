@@ -6,6 +6,7 @@ purpose: will act as a server for the portfolio website
 from flask import Flask, render_template,request,send_from_directory,url_for
 from flask_bootstrap import Bootstrap5
 from werkzeug.utils import redirect
+from config import Config  # Import Config class
 
 # Internal Modules
 from tools.wt_forms import PingMeForm, RegisterForm, LoginForm
@@ -14,8 +15,7 @@ from tools.data_model import read_all_records, create_record, init_db,Inquirer
 
 # Global Declarations/Configurations
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
-app.secret_key = "any-string-you-want-just-keep-it-secret"
+app.config.from_object(Config)  # Load configuration
 
 Bootstrap5(app)
 
@@ -46,7 +46,6 @@ def ping():
             phone=int(data["phone"]),  # Ensure phone is stored as an integer
             message=data["message"]
         )
-
         create_record(new_inquirer)
         return redirect(url_for('inquirer'))
     return redirect(url_for('home'))
@@ -81,4 +80,4 @@ def register():
 
 # ------------------------------------------
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=app.config["DEBUG"])

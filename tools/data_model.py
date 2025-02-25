@@ -42,14 +42,7 @@ class AuthUser(db.Model):
 # Initialize Database with Multiple Binds
 def init_db(app):
     """ Initialize the databases """
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///Inquirer.db"  # Default DB
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["SQLALCHEMY_BINDS"] = {
-        'auth': "sqlite:///auth.db"  # Secondary DB for auth users
-    }
-
     db.init_app(app)
-
     with app.app_context():
         db.create_all()  # Creates tables in both DBs based on bind keys
 
