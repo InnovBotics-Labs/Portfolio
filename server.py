@@ -34,31 +34,47 @@ def home() -> str:
 def ping():
     """Q & A form"""
     form = PingMeForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit() and request.method == 'POST':
         data = request.form
-        print(data["name"])
-        print(data["email"])
-        print(data["phone"])
-        print(data["message"])
-        inquirers = read_all_records()
-        return redirect(url_for('inquires'))
+        # Create an instance of the Inquirer model
+        new_inquirer = Inquirer(
+            f_name=data["f_name"],
+            l_name=data["l_name"],
+            email=data["email"],
+            country_code=data["country_code"],
+            phone=int(data["phone"]),  # Ensure phone is stored as an integer
+            message=data["message"]
+        )
+
+        create_new_record(new_inquirer)
+        return redirect(url_for('inquirer'))
     return redirect(url_for('home'))
+
+@app.route('/inquirer')
+def inquirer():
+    """Downloads the resumes"""
+    inquirers = read_all_records()
+    return render_template('Pages/inquirer.html', inquirers=inquirers)
 
 @app.route('/download')
 def download():
+    """Downloads the resumes"""
     return send_from_directory('static', path="assets/files/under-construction-sign.pdf")
 
 @app.route('/portal')
 def portal():
+    """Takes you to portal page"""
     return render_template('Pages/portal.html')
 
 @app.route('/login')
 def login():
+    """Takes you to login page"""
     login_form = LoginForm()
     return render_template('Pages/login.html',form = login_form)
 
 @app.route('/register')
 def register():
+    """ Takes you to registration """
     register_form = RegisterForm()
     return render_template('Pages/login.html', form = register_form)
 

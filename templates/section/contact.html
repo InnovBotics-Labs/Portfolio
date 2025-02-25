@@ -1,7 +1,10 @@
 {% from 'bootstrap5/form.html' import render_form %}
 <div class="container " id="header_" >
 			<h1 class="fw-bold text-light" >Get In Touch / <spam class="text-warning">Ping me</spam></h1>
+	<form action="/ping" method="POST">
+	{{ form.hidden_tag() }}
 {{ render_form(form, novalidate=False) }}
+	</form>
 </div>
 
 
