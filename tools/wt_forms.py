@@ -4,12 +4,12 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField
 from wtforms.fields.simple import PasswordField
-from wtforms.validators import DataRequired, Regexp
+from wtforms.validators import DataRequired, Regexp,Email
 
 # Class for the FORM in the website.
 class User(FlaskForm):
     """ Base class form contains only Email"""
-    email = StringField('Email', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(),Email()])
 
 class UserInfo(User):
     """ Contains list of entry variables"""
