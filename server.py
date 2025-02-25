@@ -43,7 +43,7 @@ def ping():
             l_name=data["l_name"],
             email=data["email"],
             country_code=data["country_code"],
-            phone=int(data["phone"]),  # Ensure phone is stored as an integer
+            phone=data["phone"],  # Ensure phone is stored as an integer
             message=data["message"]
         )
         create_record(new_inquirer)
