@@ -1,9 +1,10 @@
 """Create and contain database-related classes"""
 # Dependencies
+from typing import Type, TypeVar, List, Optional
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from typing import Type, TypeVar, List, Optional
+
 
 # Base Class for Models
 class Base(DeclarativeBase):
@@ -23,7 +24,7 @@ class Inquirer(db.Model):
     l_name: Mapped[str] = mapped_column(String(250), nullable=False)
     email: Mapped[str] = mapped_column(String(250), nullable=False, unique=True)
     country_code: Mapped[str] = mapped_column(String(10), nullable=False)
-    phone: Mapped[str] = mapped_column(String(20), nullable=False, unique=True)
+    phone: Mapped[str] = mapped_column(Integer, nullable=False, unique=True)
     message: Mapped[str] = mapped_column(String(250), nullable=False)
 
     def __repr__(self):
@@ -31,6 +32,7 @@ class Inquirer(db.Model):
 
 # Model for Authentication Database
 class AuthUser(db.Model):
+    """Table for auth"""
     __bind_key__ = 'auth'  # Connects to auth.db
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(250), nullable=False, unique=True)

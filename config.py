@@ -16,4 +16,3 @@ class Config:
         "auth": os.getenv("AUTH_DATABASE_URL", "sqlite:///auth.db")
     }
     DEBUG = os.getenv("DEBUG", "True") == "True"
-
