@@ -9,7 +9,8 @@ from werkzeug.utils import redirect
 
 # Internal Modules
 from tools.wt_forms import PingMeForm, RegisterForm, LoginForm
-from tools.data_model import *
+from tools.data_model import read_all_records, create_new_record, init_db,Inquirer
+
 
 # Global Declarations/Configurations
 app = Flask(__name__)

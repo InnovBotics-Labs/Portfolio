@@ -1,7 +1,7 @@
 """Create and contain database related class"""
 # Dependencies
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, ScalarResult, Integer
+from sqlalchemy import String, Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 # Class for the Models
@@ -45,18 +45,21 @@ def read_all_records() -> list[Inquirer]:
 def read_a_record(inquirer_id: int) -> Inquirer | None:
     """ Fetches a single book by ID """
     with db.session.begin():
-        return db.session.execute(db.select(Inquirer).where(Inquirer.id == inquirer_id)).scalar()
+        return db.session.execute(db.select(Inquirer).where(
+            Inquirer.id == inquirer_id)).scalar()
 
 def delete_a_record(inquirer_id: int) -> None:
     """ Deletes a book from the database """
     with db.session.begin():
-        book_to_delete = db.session.execute(db.select(Inquirer).where(Inquirer.id == inquirer_id)).scalar()
+        book_to_delete = db.session.execute(db.select(Inquirer).where(
+            Inquirer.id == inquirer_id)).scalar()
         if book_to_delete:
             db.session.delete(book_to_delete)
 
 def update_a_record(inquirer: Inquirer) -> None:
     """ Updates a book's review in the database """
     with db.session.begin():
-        book_to_update = db.session.execute(db.select(Inquirer).where(Inquirer.id == inquirer.id)).scalar()
+        book_to_update = db.session.execute(db.select(Inquirer).where(
+            Inquirer.id == inquirer.id)).scalar()
         if book_to_update:
             book_to_update.review = Inquirer.message
