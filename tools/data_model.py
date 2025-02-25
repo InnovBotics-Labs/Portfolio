@@ -2,7 +2,7 @@
 # Dependencies
 from typing import Type, TypeVar, List, Optional
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, Integer
+from sqlalchemy import String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -24,7 +24,7 @@ class Inquirer(db.Model):
     l_name: Mapped[str] = mapped_column(String(250), nullable=False)
     email: Mapped[str] = mapped_column(String(250), nullable=False, unique=True)
     country_code: Mapped[str] = mapped_column(String(10), nullable=False)
-    phone: Mapped[str] = mapped_column(Integer, nullable=False, unique=True)
+    phone: Mapped[str] = mapped_column(String(250), nullable=False, unique=True)
     message: Mapped[str] = mapped_column(String(250), nullable=False)
 
     def __repr__(self):
