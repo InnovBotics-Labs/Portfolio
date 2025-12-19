@@ -1,86 +1,131 @@
-<nav class="navbar navbar-expand-lg fixed-top transparent">
-    <div class="container-fluid ">
-        <!-- Brand Logo & Name -->
-        <a class="navbar-brand mb-0 h1 d-flex align-items-center" href="{{ url_for('home') }}">
+<!-- Navigation Bar -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 lg:h-20">
+            <!-- Brand Logo & Name -->
+            <a href="{{ url_for('home') }}" class="flex items-center gap-2 group">
+                <i
+                    class="fas fa-laptop-code text-xl text-primary-400 group-hover:text-primary-300 transition-colors"></i>
+                <span class="font-display font-bold text-lg md:text-xl text-white">
+                    <span class="text-primary-400 underline decoration-2 underline-offset-2">P</span>rabhukumar
+                    <span class="text-primary-400 underline decoration-2 underline-offset-2">S</span>ivamoorthy
+                </span>
+            </a>
 
-            <span class="fw-bold"><i class="fas fa-laptop-code me-2"></i><u><b>P</b></u>rabhukumar <u><b>S</b></u>ivamoorthy</span>
-        </a>
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors">
+                <i class="fas fa-bars text-xl text-white"></i>
+            </button>
 
-        <!-- Toggle Button for Mobile -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+            <!-- Desktop Navigation -->
+            <div class="hidden lg:flex items-center gap-1">
+                <button onclick="showContent('Products')"
+                    class="nav-link px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all font-medium">
+                    <i class="fas fa-cubes mr-2 text-primary-400"></i>
+                    <span class="underline decoration-primary-400 decoration-2 underline-offset-2">P</span>roducts
+                </button>
+                <button onclick="showContent('Patents')"
+                    class="nav-link px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all font-medium">
+                    <i class="fas fa-lightbulb mr-2 text-primary-400"></i>
+                    <span class="underline decoration-primary-400 decoration-2 underline-offset-2">P</span>atents
+                </button>
+                <button onclick="showContent('Published_Papers')"
+                    class="nav-link px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all font-medium">
+                    <i class="fas fa-file-alt mr-2 text-primary-400"></i>
+                    <span class="underline decoration-primary-400 decoration-2 underline-offset-2">P</span>apers
+                </button>
+                <button onclick="showContent('Projects')"
+                    class="nav-link px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all font-medium">
+                    <i class="fas fa-project-diagram mr-2 text-primary-400"></i>
+                    <span class="underline decoration-primary-400 decoration-2 underline-offset-2">P</span>rojects
+                </button>
+                <a href="#Profession"
+                    class="nav-link px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all font-medium">
+                    <i class="fas fa-briefcase mr-2 text-primary-400"></i>
+                    <span class="underline decoration-primary-400 decoration-2 underline-offset-2">P</span>rofession
+                </a>
+            </div>
 
-        <!-- Navbar Links -->
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav justify-content-center flex-grow-1">
-                <li class="nav-item dropdown me-3 ms-3">
-                    <a class="nav-link px-3 fw-semibold" href="#" onclick="showContent('Products')">
-                        <i class="fas fa-cubes"></i> <b><u>P</u></b>roducts</a>
-                </li>
-                <li class="nav-item dropdown me-3 ms-3">
-                    <a class="nav-link px-3 fw-semibold" href="#" onclick="showContent('Patents')">
-                        <i class="fas fa-lightbulb"></i> <b><u>P</u></b>atents</a>
-                </li>
-                <li class="nav-item dropdown me-3 ms-3">
-                    <a class="nav-link px-3 fw-semibold" href="#" onclick="showContent('Published_Papers')">
-                        <i class="fas fa-file-alt"></i> <b><u>P</u></b>apers</a>
-                </li>
-                <li class="nav-item me-3 ms-3">
-                    <a class="nav-link px-3 fw-semibold" href="#" onclick="showContent('Projects')">
-                        <i class="fas fa-project-diagram"></i> <b><u>P</u></b>rojects
-                    </a>
-                </li>
-                <li class="nav-item me-3 ms-3">
-                    <a class="nav-link px-3 fw-semibold" href="#Profession">
-                        <i class="fas fa-briefcase"></i> <b><u>P</u></b>rofession
-                    </a>
-                </li>
-            </ul>
-
-            <!-- Right-aligned links -->
-            <ul class="navbar-nav ms-auto me-3 ms-3">
-                <li class="nav-item dropdown">
-                    <a class="nav-link fw-semibold d-flex align-items-center me-3 ms-3" href="#contact">
-                        <i class="fas fa-envelope"></i><b><u>P</u></b>ing-me</a>
-                </li>
-                <li class="nav-item me-3 ms-3">
-                    <!-- Profile Dropdown -->
-                    {% if condition %}
-                    <div class="dropdown">
-                        <a class="nav-link text-white dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown" id="profileDropdown">
-                            <img alt="Profile" class="rounded-circle me-2" height="40"
-                                 src="{{url_for('static', filename='assets/Prabhu.png')}}" width="40">
+            <!-- Right Section -->
+            <div class="hidden lg:flex items-center gap-4">
+                <a href="#contact"
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all font-medium">
+                    <i class="fas fa-envelope text-primary-400"></i>
+                    <span class="underline decoration-primary-400 decoration-2 underline-offset-2">P</span>ing-me
+                </a>
+                {% if condition %}
+                <div class="relative group">
+                    <button
+                        class="flex items-center gap-2 p-1 rounded-full border-2 border-white/30 hover:border-white/60 transition-colors">
+                        <img src="{{url_for('static', filename='assets/Prabhu.png')}}" alt="Profile"
+                            class="w-8 h-8 rounded-full object-cover">
+                    </button>
+                    <div
+                        class="absolute right-0 mt-2 w-48 bg-dark-800/95 backdrop-blur-lg rounded-xl shadow-xl border border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden">
+                        <a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors">
+                            <i class="fas fa-user text-primary-400"></i>
+                            <span>Profile</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> <b><u>P</u></b>rofile</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i><b><u>P</u></b>references</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i><b><u>P</u></b>ortal Sign-off</a></li>
-                        </ul>
+                        <a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors">
+                            <i class="fas fa-cog text-primary-400"></i>
+                            <span>Preferences</span>
+                        </a>
+                        <div class="border-t border-white/10"></div>
+                        <a href="#"
+                            class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors text-red-400">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Sign Off</span>
+                        </a>
                     </div>
-                    {% else %}
-                    <a class="btn hero-btn secondary" href="{{ url_for('portal') }}"><b><u>P</u></b>ortal</a>
-                    {% endif %}
-                </li>
-            </ul>
+                </div>
+                {% else %}
+                <a href="{{ url_for('portal') }}"
+                    class="px-6 py-2.5 rounded-full bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-semibold shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-300 transform hover:scale-105">
+                    <span class="underline decoration-2 underline-offset-2">P</span>ortal
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden lg:hidden bg-dark-800/95 backdrop-blur-lg border-t border-white/10">
+        <div class="px-4 py-4 space-y-2">
+            <button onclick="showContent('Products')"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all font-medium">
+                <i class="fas fa-cubes text-primary-400"></i>
+                Products
+            </button>
+            <button onclick="showContent('Patents')"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all font-medium">
+                <i class="fas fa-lightbulb text-primary-400"></i>
+                Patents
+            </button>
+            <button onclick="showContent('Published_Papers')"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all font-medium">
+                <i class="fas fa-file-alt text-primary-400"></i>
+                Papers
+            </button>
+            <button onclick="showContent('Projects')"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all font-medium">
+                <i class="fas fa-project-diagram text-primary-400"></i>
+                Projects
+            </button>
+            <a href="#Profession"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all font-medium">
+                <i class="fas fa-briefcase text-primary-400"></i>
+                Profession
+            </a>
+            <div class="border-t border-white/10 my-2"></div>
+            <a href="#contact"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all font-medium">
+                <i class="fas fa-envelope text-primary-400"></i>
+                Ping-me
+            </a>
+            <a href="{{ url_for('portal') }}"
+                class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-gradient-to-r from-primary-600 to-primary-500 text-white font-semibold shadow-lg">
+                Portal
+            </a>
         </div>
     </div>
 </nav>
-<!-- Sliding Divs (Under Navbar) -->
-<div class="sliding-div" id="Products">
-    <button class="close-btn">&times;</button>
-    {% include "nav_bar/products.html" %}
-</div>
-<div class="sliding-div" id="Patents">
-    <button class="close-btn">&times;</button>
-     {% include "nav_bar/patent.html" %}
-</div>
-<div class="sliding-div" id="Published_Papers">
-    <button class="close-btn">&times;</button>
-   Papers
-</div>
-<div class="sliding-div" id="Projects">
-    <button class="close-btn">&times;</button>
-    {% include "nav_bar/projects.html" %}
-</div>

@@ -3,8 +3,7 @@ AppName:Server
 purpose: will act as a server for the portfolio website
 """
 # Dependencies
-from flask import Flask, render_template,request,send_from_directory,url_for
-from flask_bootstrap import Bootstrap5
+from flask import Flask, render_template, request, send_from_directory, url_for
 from werkzeug.utils import redirect
 from config import Config  # Import Config class
 
@@ -17,7 +16,7 @@ from tools.data_model import read_all_records, create_record, init_db,Inquirer
 app = Flask(__name__)
 app.config.from_object(Config)  # Load configuration
 
-Bootstrap5(app)
+# Using Tailwind CSS - no Bootstrap initialization needed
 
 init_db(app)
 
