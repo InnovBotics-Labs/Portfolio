@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50">
+  <defs>
+    <style>
+      .sandisk-text { fill: #ED1C24; font-family: Arial, sans-serif; font-weight: bold; font-size: 32px; }
+      .sandisk-accent { fill: #ED1C24; }
+    </style>
+  </defs>
+  <text x="10" y="38" class="sandisk-text">SanDisk</text>
+  <rect x="145" y="10" width="35" height="30" rx="3" class="sandisk-accent"/>
+</svg>
