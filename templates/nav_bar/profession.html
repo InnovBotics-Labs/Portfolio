@@ -1,104 +1,194 @@
-<div class="container-fluid " id="profession">
-
-    <br>
-    <div id="header_" class="row text-center justify-content-center">
-      <h1 class="fw-bold " style="color:white">Career <span class="text-warning">Milestones</span></h1>
+<!-- Career Milestones Section -->
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section Header -->
+    <div class="text-center mb-16">
+        <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
+            Career <span
+                class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-500">Milestones</span>
+        </h2>
+        <p class="mt-4 text-white/60 text-lg max-w-2xl mx-auto">
+            A journey of continuous learning and professional growth
+        </p>
     </div>
-    <div class="row text-center justify-content-center" >
 
-        <div class="col-8 " style="">
-            <div class="timeline-container">
-                <div class="timeline-line"></div>
+    <!-- Timeline Container -->
+    <div class="relative">
+        <!-- Timeline Line (Desktop) -->
+        <div
+            class="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-primary-500 via-blue-500 to-primary-700 rounded-full">
+        </div>
 
-                <!-- Milestone 0 -->
-                <div class="milestone left">
-                    <div class="tooltip"><b> Current Role</b></div>
-                    <div class="logo">
-                        <img alt="LEAD Logo" src="https://www.logo.wine/a/logo/SanDisk/SanDisk-Logo.wine.svg">
-                    </div>
-                    <div class="content">
-                        <h3>Principal Engineer</h3>
-                        <p class="hover-item"><a class="text-decoration-none" href="https://www.westerndigital.com"
-                                                 target="_blank">SanDisk Technologies Inc</a></p>
-                        <p>Jan 2025 — Present</p>
+        <!-- Timeline Line (Mobile) -->
+        <div
+            class="md:hidden absolute left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-primary-500 via-blue-500 to-primary-700 rounded-full">
+        </div>
+
+        <!-- Milestones -->
+        <div class="space-y-8 md:space-y-12">
+
+            <!-- Milestone 0 - Current Role -->
+            <div class="relative flex flex-col md:flex-row md:items-center">
+                <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1">
+                    <div
+                        class="ml-12 md:ml-0 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary-500/50 transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-xl hover:shadow-primary-500/10 group">
+                        <div class="flex items-center gap-4 justify-start md:justify-end mb-4">
+                            <img src="{{url_for('static', filename='assets/SanDisk.svg')}}" alt="SanDisk Logo"
+                                class="h-12 w-auto object-contain opacity-80 group-hover:opacity-100 transition-opacity">
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Principal Engineer</h3>
+                        <a href="https://www.westerndigital.com" target="_blank"
+                            class="text-primary-400 hover:text-primary-300 transition-colors">
+                            SanDisk Technologies Inc
+                        </a>
+                        <p class="text-white/50 text-sm mt-2">Jan 2025 — Present</p>
+                        <span
+                            class="inline-block mt-3 px-3 py-1 bg-green-500/20 text-green-400 text-xs font-semibold rounded-full">Current
+                            Role</span>
                     </div>
                 </div>
+                <!-- Timeline Dot -->
+                <div
+                    class="absolute left-4 md:left-1/2 md:-translate-x-1/2 w-4 h-4 bg-primary-500 border-4 border-dark-800 rounded-full z-10 ring-4 ring-primary-500/30">
+                </div>
+                <div class="md:w-1/2 md:pl-12 order-1 md:order-2"></div>
+            </div>
 
-                <!-- Milestone 1 -->
-                <div class="milestone left">
-                    <div class="tooltip"><b>~ 6 Years</b></div>
-                    <div class="logo">
-                        <img alt="LEAD Logo"
-                             src="https://www.westerndigital.com/content/dam/store/en-us/assets/home-page/brand-logos/header-main-logo.svg">
-                    </div>
-                    <div class="content">
-                        <h3>Principal Engineer</h3>
-                        <p class="hover-item"><a class="text-decoration-none" href="https://www.westerndigital.com"
-                                                 target="_blank">Western Digital Technologies Inc</a></p>
-                        <p>May 2018 — Dec 2024</p>
+            <!-- Milestone 1 - WD -->
+            <div class="relative flex flex-col md:flex-row md:items-center">
+                <div class="md:w-1/2 md:pr-12 order-2 md:order-1"></div>
+                <!-- Timeline Dot -->
+                <div
+                    class="absolute left-4 md:left-1/2 md:-translate-x-1/2 w-4 h-4 bg-blue-500 border-4 border-dark-800 rounded-full z-10 ring-4 ring-blue-500/30">
+                </div>
+                <div class="md:w-1/2 md:pl-12 order-1 md:order-2">
+                    <div
+                        class="ml-12 md:ml-0 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-blue-500/50 transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-500/10 group">
+                        <div class="flex items-center gap-4 mb-4">
+                            <img src="https://www.westerndigital.com/content/dam/store/en-us/assets/home-page/brand-logos/header-main-logo.svg"
+                                alt="WD Logo"
+                                class="h-8 w-auto object-contain filter brightness-0 invert opacity-80 group-hover:opacity-100 transition-opacity">
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Principal Engineer</h3>
+                        <a href="https://www.westerndigital.com" target="_blank"
+                            class="text-blue-400 hover:text-blue-300 transition-colors">
+                            Western Digital Technologies Inc
+                        </a>
+                        <p class="text-white/50 text-sm mt-2">May 2018 — Dec 2024</p>
+                        <span
+                            class="inline-block mt-3 px-3 py-1 bg-blue-500/20 text-blue-400 text-xs font-semibold rounded-full">~6
+                            Years</span>
                     </div>
                 </div>
+            </div>
 
-                <!-- Milestone 2 -->
-                <div class="milestone right">
-                    <div class="tooltip">Graduated Dec 2017</div>
-                    <div class="logo">
-                        <img alt="Master's Program"
-                             src="https://www.uhcl.edu/_resources/img/uhcl-logo-horizontal-color.svg">
-                    </div>
-                    <div class="content">
-                        <h3>Master's in Computer Engineering</h3>
-                        <p class="hover-item"><a class="text-decoration-none" href="https://www.uhcl.edu"
-                                                 target="_blank">University of Houston Clear-Lake</a></p>
-                        <p>Jan 2016 — Dec 2017</p>
+            <!-- Milestone 2 - Master's -->
+            <div class="relative flex flex-col md:flex-row md:items-center">
+                <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1">
+                    <div
+                        class="ml-12 md:ml-0 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-purple-500/50 transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-xl hover:shadow-purple-500/10 group">
+                        <div class="flex items-center gap-4 justify-start md:justify-end mb-4">
+                            <img src="https://www.uhcl.edu/_resources/img/uhcl-logo-horizontal-color.svg"
+                                alt="UHCL Logo"
+                                class="h-10 w-auto object-contain opacity-80 group-hover:opacity-100 transition-opacity">
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Master's in Computer Engineering</h3>
+                        <a href="https://www.uhcl.edu" target="_blank"
+                            class="text-purple-400 hover:text-purple-300 transition-colors">
+                            University of Houston Clear-Lake
+                        </a>
+                        <p class="text-white/50 text-sm mt-2">Jan 2016 — Dec 2017</p>
+                        <span
+                            class="inline-block mt-3 px-3 py-1 bg-purple-500/20 text-purple-400 text-xs font-semibold rounded-full">🎓
+                            Graduated</span>
                     </div>
                 </div>
+                <!-- Timeline Dot -->
+                <div
+                    class="absolute left-4 md:left-1/2 md:-translate-x-1/2 w-4 h-4 bg-purple-500 border-4 border-dark-800 rounded-full z-10 ring-4 ring-purple-500/30">
+                </div>
+                <div class="md:w-1/2 md:pl-12 order-1 md:order-2"></div>
+            </div>
 
-                <!-- Milestone 3 -->
-                <div class="milestone left">
-                    <div class="tooltip">1 Year ~4 Months</div>
-                    <div class="logo">
-                        <img alt="Exergy Logo" src="https://www.exergyheatingsolutions.com/img/logo.png">
-                    </div>
-                    <div class="content">
-                        <h3>Engineer</h3>
-                        <p class="hover-item"><a class="text-decoration-none"
-                                                 href="https://www.exergyheatingsolutions.com/products.html"
-                                                 target="_blank">Exergy Heating Solutions Pvt Ltd</a></p>
-                        <p>Apr 2014 - Dec 2015</p>
+            <!-- Milestone 3 - Exergy -->
+            <div class="relative flex flex-col md:flex-row md:items-center">
+                <div class="md:w-1/2 md:pr-12 order-2 md:order-1"></div>
+                <!-- Timeline Dot -->
+                <div
+                    class="absolute left-4 md:left-1/2 md:-translate-x-1/2 w-4 h-4 bg-orange-500 border-4 border-dark-800 rounded-full z-10 ring-4 ring-orange-500/30">
+                </div>
+                <div class="md:w-1/2 md:pl-12 order-1 md:order-2">
+                    <div
+                        class="ml-12 md:ml-0 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-orange-500/50 transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-xl hover:shadow-orange-500/10 group">
+                        <div class="flex items-center gap-4 mb-4">
+                            <img src="https://www.exergyheatingsolutions.com/img/logo.png" alt="Exergy Logo"
+                                class="h-10 w-auto object-contain filter brightness-0 invert opacity-80 group-hover:opacity-100 transition-opacity">
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Engineer</h3>
+                        <a href="https://www.exergyheatingsolutions.com/products.html" target="_blank"
+                            class="text-orange-400 hover:text-orange-300 transition-colors">
+                            Exergy Heating Solutions Pvt Ltd
+                        </a>
+                        <p class="text-white/50 text-sm mt-2">Apr 2014 — Dec 2015</p>
+                        <span
+                            class="inline-block mt-3 px-3 py-1 bg-orange-500/20 text-orange-400 text-xs font-semibold rounded-full">1
+                            Year 4 Months</span>
                     </div>
                 </div>
+            </div>
 
-                <!-- Milestone 4 -->
-                <div class="milestone left">
-                    <div class="tooltip">~ 10 Months</div>
-                    <div class="logo">
-                        <img alt="Kaynes-Logo" src="{{url_for('static', filename='assets/KaynesLogoNew.svg')}}">
-                    </div>
-                    <div class="content">
-                        <h3>Engineer</h3>
-                        <p class="hover-item"><a class="text-decoration-none" href="https://www.kaynestechnology.co.in"
-                                                 target="_blank">Kaynes Technology Pvt Ltd</a></p>
-                        <p>Jul 2013 - Mar 2014</p>
+            <!-- Milestone 4 - Kaynes -->
+            <div class="relative flex flex-col md:flex-row md:items-center">
+                <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1">
+                    <div
+                        class="ml-12 md:ml-0 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-teal-500/50 transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-xl hover:shadow-teal-500/10 group">
+                        <div class="flex items-center gap-4 justify-start md:justify-end mb-4">
+                            <img src="{{url_for('static', filename='assets/KaynesLogoNew.svg')}}" alt="Kaynes Logo"
+                                class="h-10 w-auto object-contain filter brightness-0 invert opacity-80 group-hover:opacity-100 transition-opacity">
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Engineer</h3>
+                        <a href="https://www.kaynestechnology.co.in" target="_blank"
+                            class="text-teal-400 hover:text-teal-300 transition-colors">
+                            Kaynes Technology Pvt Ltd
+                        </a>
+                        <p class="text-white/50 text-sm mt-2">Jul 2013 — Mar 2014</p>
+                        <span
+                            class="inline-block mt-3 px-3 py-1 bg-teal-500/20 text-teal-400 text-xs font-semibold rounded-full">~10
+                            Months</span>
                     </div>
                 </div>
+                <!-- Timeline Dot -->
+                <div
+                    class="absolute left-4 md:left-1/2 md:-translate-x-1/2 w-4 h-4 bg-teal-500 border-4 border-dark-800 rounded-full z-10 ring-4 ring-teal-500/30">
+                </div>
+                <div class="md:w-1/2 md:pl-12 order-1 md:order-2"></div>
+            </div>
 
-                <!-- Milestone 5 -->
-                <div class="milestone right">
-                    <div class="logo">
-                        <img alt="Graduation" src="{{url_for('static', filename='assets/Kongu.svg')}}">
+            <!-- Milestone 5 - Bachelor's -->
+            <div class="relative flex flex-col md:flex-row md:items-center">
+                <div class="md:w-1/2 md:pr-12 order-2 md:order-1"></div>
+                <!-- Timeline Dot -->
+                <div
+                    class="absolute left-4 md:left-1/2 md:-translate-x-1/2 w-4 h-4 bg-amber-500 border-4 border-dark-800 rounded-full z-10 ring-4 ring-amber-500/30">
+                </div>
+                <div class="md:w-1/2 md:pl-12 order-1 md:order-2">
+                    <div
+                        class="ml-12 md:ml-0 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-amber-500/50 transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-500/10 group">
+                        <div class="flex items-center gap-4 mb-4">
+                            <img src="{{url_for('static', filename='assets/Kongu.svg')}}" alt="Kongu Logo"
+                                class="h-12 w-auto object-contain opacity-80 group-hover:opacity-100 transition-opacity">
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Bachelor's in Engineering (ECE)</h3>
+                        <a href="https://www.kongu.ac.in" target="_blank"
+                            class="text-amber-400 hover:text-amber-300 transition-colors">
+                            Kongu Engineering College
+                        </a>
+                        <p class="text-white/50 text-sm mt-2">Aug 2009 — Jun 2013</p>
+                        <span
+                            class="inline-block mt-3 px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-semibold rounded-full">🎓
+                            Where It All Began</span>
                     </div>
-                    <div class="content">
-                        <h3>Bachelor's in Engineering (ECE)</h3>
-                        <p class="hover-item"><a class="text-decoration-none" href="https://www.kongu.ac.in"
-                                                 target="_blank">Kongu Engineering College</a></p>
-                        <p>Aug 2009 - Jun 2013</p>
-                    </div>
-                    <div class="tooltip">Graduated in Jun 2013</div>
                 </div>
             </div>
         </div>
-
     </div>
-
 </div>

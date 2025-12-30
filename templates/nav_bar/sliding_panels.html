@@ -1,0 +1,66 @@
+<!-- Sliding Panels Container -->
+<!-- Products Panel -->
+<div id="Products"
+    class="sliding-panel fixed inset-0 z-40 -translate-y-full opacity-0 pointer-events-none transition-all duration-500 ease-out">
+    <div class="absolute inset-0 bg-gradient-to-br from-dark-900/98 via-primary-950/98 to-dark-800/98 backdrop-blur-xl">
+    </div>
+    <div class="relative z-10 w-full h-full overflow-y-auto pt-20 pb-8 px-4 sm:px-6 lg:px-8">
+        <button onclick="closePanel('Products')"
+            class="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white text-2xl transition-all hover:rotate-90 duration-300">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="max-w-6xl mx-auto">
+            {% include "nav_bar/products.html" %}
+        </div>
+    </div>
+</div>
+
+<!-- Patents Panel -->
+<div id="Patents"
+    class="sliding-panel fixed inset-0 z-40 -translate-y-full opacity-0 pointer-events-none transition-all duration-500 ease-out">
+    <div class="absolute inset-0 bg-gradient-to-br from-dark-900/98 via-primary-950/98 to-dark-800/98 backdrop-blur-xl">
+    </div>
+    <div class="relative z-10 w-full h-full overflow-y-auto pt-20 pb-8 px-4 sm:px-6 lg:px-8">
+        <button onclick="closePanel('Patents')"
+            class="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white text-2xl transition-all hover:rotate-90 duration-300">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="max-w-6xl mx-auto">
+            {% include "nav_bar/patent.html" %}
+        </div>
+    </div>
+</div>
+
+<!-- Papers Panel -->
+<div id="Published_Papers"
+    class="sliding-panel fixed inset-0 z-40 -translate-y-full opacity-0 pointer-events-none transition-all duration-500 ease-out">
+    <div class="absolute inset-0 bg-gradient-to-br from-dark-900/98 via-primary-950/98 to-dark-800/98 backdrop-blur-xl">
+    </div>
+    <div class="relative z-10 w-full h-full overflow-y-auto pt-20 pb-8 px-4 sm:px-6 lg:px-8">
+        <button onclick="closePanel('Published_Papers')"
+            class="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white text-2xl transition-all hover:rotate-90 duration-300">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="max-w-6xl mx-auto text-center py-20">
+            <i class="fas fa-file-alt text-6xl text-primary-400 mb-6"></i>
+            <h2 class="text-3xl font-display font-bold text-white mb-4">Published Papers</h2>
+            <p class="text-white/60 text-lg">Coming Soon - Research publications will be listed here.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Projects Panel -->
+<div id="Projects"
+    class="sliding-panel fixed inset-0 z-40 -translate-y-full opacity-0 pointer-events-none transition-all duration-500 ease-out">
+    <div class="absolute inset-0 bg-gradient-to-br from-dark-900/98 via-primary-950/98 to-dark-800/98 backdrop-blur-xl">
+    </div>
+    <div class="relative z-10 w-full h-full overflow-y-auto pt-20 pb-8 px-4 sm:px-6 lg:px-8">
+        <button onclick="closePanel('Projects')"
+            class="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white text-2xl transition-all hover:rotate-90 duration-300">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="max-w-6xl mx-auto">
+            {% include "nav_bar/projects.html" %}
+        </div>
+    </div>
+</div>
