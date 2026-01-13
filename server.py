@@ -25,6 +25,7 @@ from tools.pdf_editor import (
     apply_ocr_to_pdf,
     add_background_color_to_pdf
 )
+from tools.data_converter import convert_data
 
 
 # Global Declarations/Configurations
@@ -283,6 +284,34 @@ def pdf_clear():
     """
     count = cleanup_upload_folder(app.config['UPLOAD_FOLDER'])
     return jsonify({'success': True, 'deleted': count})
+
+
+
+# =============================================================================
+# Data Converter Routes
+# =============================================================================
+
+@app.route('/data-converter')
+def data_converter():
+    """Data Converter page"""
+    return render_template('Pages/data_converter.html')
+
+@app.route('/api/convert-data', methods=['POST'])
+def api_convert_data():
+    """
+    API endpoint for data conversion
+    Expects JSON: { content: str, inputFormat: str, outputFormat: str }
+    """
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+    content = data.get('content', '')
+    input_fmt = data.get('inputFormat', 'json')
+    output_fmt = data.get('outputFormat', 'xml')
+    
+    result = convert_data(content, input_fmt, output_fmt)
+    return jsonify(result)
 
 
 # ------------------------------------------

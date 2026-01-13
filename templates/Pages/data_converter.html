@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta name="description"
+        content="Free Online Data Converter - JSON, XML, CSV, YAML. Convert between formats instantly.">
+    <title>Data Converter - Prabhu's Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { dark: { 900: '#0a0f1f', 800: '#111827', 700: '#1f2937', 600: '#374151' } },
+                    fontFamily: { 'sans': ['Inter', 'system-ui', 'sans-serif'], 'code': ['Fira Code', 'monospace'] },
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0f1f 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+        }
+
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .editor-textarea {
+            font-family: 'Fira Code', monospace;
+            tab-size: 2;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tree View Styles */
+        .tree-key {
+            color: #569CD6;
+        }
+
+        .tree-string {
+            color: #CE9178;
+        }
+
+        .tree-number {
+            color: #B5CEA8;
+        }
+
+        .tree-boolean {
+            color: #569CD6;
+        }
+
+        .tree-null {
+            color: #569CD6;
+        }
+
+        .tree-toggle {
+            cursor: pointer;
+            user-select: none;
+            color: #858585;
+        }
+
+        .tree-toggle:hover {
+            color: #FFFFF0;
+        }
+    </style>
+</head>
+
+<body class="text-white/90 font-sans antialiased flex flex-col min-h-screen">
+    <div id="converter-root" class="flex-1 flex flex-col"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const Header = () => (
+            <header className="sticky top-0 z-50 bg-dark-900/80 backdrop-blur-lg border-b border-white/10">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-16">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                                <i className="fas fa-exchange-alt text-white text-lg"></i>
+                            </div>
+                            <div>
+                                <h1 className="font-bold text-lg text-white">Data Converter</h1>
+                                <p className="text-xs text-white/50 hidden sm:block">JSON · XML · CSV · YAML</p>
+                            </div>
+                        </div>
+                        <a href="/" className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-all">
+                            <i className="fas fa-arrow-left text-sm"></i>
+                            <span className="hidden sm:inline">Back</span>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        );
+
+        // --- Tree View Components ---
+
+        const JsonNode = ({ name, value, isLast, depth = 0, filter = '' }) => {
+            const [expanded, setExpanded] = useState(true);
+
+            // Check if this node matches filter (simple text match for now)
+            const matchesFilter = (val) => {
+                if (!filter) return true;
+                const searchLower = filter.toLowerCase();
+                // Check name (key) or value
+                if (name && name.toLowerCase().includes(searchLower)) return true;
+                if (val !== null && typeof val !== 'object' && String(val).toLowerCase().includes(searchLower)) return true;
+                return false;
+            };
+
+            // If it's a leaf node, hide if it doesn't match
+            if (value === null || typeof value !== 'object') {
+                if (!matchesFilter(value)) return null;
+            }
+
+            // Indentation with guide line
+            const indent = {
+                paddingLeft: `${1.5}rem`,
+                borderLeft: depth > 0 ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                marginLeft: depth > 0 ? '0.75rem' : 0
+            };
+
+            if (value === null) {
+                return (
+                    <div className="font-code text-xs relative group/line">
+                        <div style={indent} className="py-1 hover:bg-white/5 rounded px-1 transition-colors">
+                            <span className="tree-key opacity-80">{name ? `${name}: ` : ''}</span>
+                            <span className="tree-null">null</span>
+                            <span className="text-white/30">{!isLast && ','}</span>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (typeof value === 'boolean') {
+                return (
+                    <div className="font-code text-xs relative group/line">
+                        <div style={indent} className="py-1 hover:bg-white/5 rounded px-1 transition-colors">
+                            <span className="tree-key opacity-80">{name ? `${name}: ` : ''}</span>
+                            <span className="tree-boolean font-semibold">{value.toString()}</span>
+                            <span className="text-white/30">{!isLast && ','}</span>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (typeof value === 'number') {
+                return (
+                    <div className="font-code text-xs relative group/line">
+                        <div style={indent} className="py-1 hover:bg-white/5 rounded px-1 transition-colors">
+                            <span className="tree-key opacity-80">{name ? `${name}: ` : ''}</span>
+                            <span className="tree-number">{value}</span>
+                            <span className="text-white/30">{!isLast && ','}</span>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (typeof value === 'string') {
+                return (
+                    <div className="font-code text-xs relative group/line">
+                        <div style={indent} className="py-1 hover:bg-white/5 rounded px-1 transition-colors break-words">
+                            <span className="tree-key opacity-80">{name ? `${name}: ` : ''}</span>
+                            <span className="tree-string">"{value}"</span>
+                            <span className="text-white/30">{!isLast && ','}</span>
+                        </div>
+                    </div>
+                );
+            }
+
+            const isArray = Array.isArray(value);
+            const isEmpty = isArray ? value.length === 0 : Object.keys(value).length === 0;
+            const openChar = isArray ? '[' : '{';
+            const closeChar = isArray ? ']' : '}';
+
+            // Auto-expand if filter is active
+            if (filter && !expanded) setExpanded(true);
+
+            return (
+                <div className="font-code text-xs">
+                    <div style={indent} className="py-1 hover:bg-white/5 rounded px-1 flex items-center gap-1 group transition-colors">
+                        {!isEmpty && (
+                            <i onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }}
+                                className={`tree-toggle fas fa-caret-${expanded ? 'down' : 'right'} w-4 text-center transition-colors hover:text-white scale-90`}
+                            ></i>
+                        )}
+                        {isEmpty && <span className="w-4"></span>}
+                        <span className="tree-key opacity-80">{name ? `${name}: ` : ''}</span>
+                        <span className="text-white/60 font-bold">{openChar}</span>
+                        {!expanded && !isEmpty && <span className="text-white/30 italic mx-2 text-[10px]">{isArray ? `${value.length} items` : '...'}</span>}
+                        {!expanded && <span className="text-white/60 font-bold">{closeChar}</span>}
+                        {!expanded && <span className="text-white/30">{!isLast && ','}</span>}
+                    </div>
+                    {expanded && !isEmpty && (
+                        <div className="relative">
+                            {isArray ? (
+                                value.map((item, i) => (
+                                    <JsonNode key={i} value={item} isLast={i === value.length - 1} depth={depth + 1} filter={filter} />
+                                ))
+                            ) : (
+                                Object.keys(value).map((key, i) => (
+                                    <JsonNode key={key} name={key} value={value[key]} isLast={i === Object.keys(value).length - 1} depth={depth + 1} filter={filter} />
+                                ))
+                            )}
+                            <div style={indent} className="py-0.5 mt-0.5 text-white/50">
+                                <span className="text-white/60 font-bold">{closeChar}</span>
+                                <span className="text-white/30">{!isLast && ','}</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const JsonTreeView = ({ data, filter }) => {
+            if (!data) return <div className="p-8 text-center text-white/30 text-sm">Empty data</div>;
+            let parsed = null;
+            try {
+                parsed = typeof data === 'string' ? JSON.parse(data) : data;
+            } catch (e) {
+                return (
+                    <div className="p-8 flex flex-col items-center justify-center text-rose-400">
+                        <i className="fas fa-exclamation-triangle text-2xl mb-2"></i>
+                        <p className="text-sm">Tree View only works with valid JSON</p>
+                        <p className="text-xs text-rose-400/50 mt-1">Please ensure your content is valid JSON to use this view.</p>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="p-4 overflow-auto h-full json-tree">
+                    <JsonNode value={parsed} isLast={true} filter={filter} />
+                </div>
+            );
+        };
+
+
+        const Editor = ({ value, onChange, placeholder, readOnly, title, format, onFormatChange, onCopy, onDownload, onClear, onUpload }) => {
+            const fileInputRef = useRef(null);
+            const [viewMode, setViewMode] = useState('code'); // 'code' | 'tree'
+            const [searchTerm, setSearchTerm] = useState('');
+
+            const handleFileChange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const content = event.target.result;
+                    // Auto-detect format from extension
+                    const ext = file.name.split('.').pop().toLowerCase();
+                    const formatMap = { json: 'json', xml: 'xml', csv: 'csv', yaml: 'yaml', yml: 'yaml' };
+                    const detectedFormat = formatMap[ext] || 'json';
+                    onUpload(content, detectedFormat);
+                };
+                reader.readAsText(file);
+                e.target.value = ''; // Reset for re-upload
+            };
+
+            const formatContent = (minify = false) => {
+                if (!value) return;
+                try {
+                    // Try JSON first
+                    const parsed = JSON.parse(value);
+                    const formatted = JSON.stringify(parsed, null, minify ? 0 : 2);
+                    onChange(formatted);
+                } catch (e) {
+                    // For non-JSON, we skip formatting for now to avoid breaking things
+                    // or could add a simple regex XML formatter in future
+                }
+            };
+
+            return (
+                <div className="flex-1 flex flex-col glass-panel rounded-xl overflow-hidden shadow-2xl h-[600px] sm:h-[calc(100vh-240px)] min-h-[400px]">
+                    <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-b border-white/10">
+                        <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium text-white/70">{title}</span>
+                            <div className="flex bg-dark-800 rounded-lg p-0.5 border border-white/10">
+                                <button onClick={() => setViewMode('code')} className={`px-2 py-1 rounded text-xs transition-all ${viewMode === 'code' ? 'bg-white/10 text-white shadow' : 'text-white/40 hover:text-white'}`}><i className="fas fa-code mr-1"></i>Code</button>
+                                <button onClick={() => setViewMode('tree')} className={`px-2 py-1 rounded text-xs transition-all ${viewMode === 'tree' ? 'bg-white/10 text-white shadow' : 'text-white/40 hover:text-white'}`}><i className="fas fa-project-diagram mr-1"></i>Tree</button>
+                            </div>
+
+                            {/* Search Input */}
+                            <div className="relative group mx-2">
+                                <i className="fas fa-search absolute left-2 top-1/2 -translate-y-1/2 text-xs text-white/30 group-focus-within:text-cyan-400"></i>
+                                <input
+                                    type="text"
+                                    placeholder="Search tree..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className={`bg-white/5 border border-white/10 rounded-lg py-1 pl-7 pr-2 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-all font-sans ${viewMode === 'tree' ? 'w-24 focus:w-40 opacity-100' : 'w-0 p-0 border-0 opacity-0 pointer-events-none'}`}
+                                />
+                            </div>
+                            <select
+                                value={format}
+                                onChange={(e) => onFormatChange(e.target.value)}
+                                className="bg-dark-800 border border-white/20 rounded-md text-xs px-2 py-1 text-white focus:outline-none focus:border-cyan-500"
+                            >
+                                <option value="json">JSON</option>
+                                <option value="xml">XML</option>
+                                <option value="csv">CSV</option>
+                                <option value="yaml">YAML</option>
+                            </select>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {onUpload && (
+                                <>
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept=".json,.xml,.csv,.yaml,.yml"
+                                        onChange={handleFileChange}
+                                        className="hidden"
+                                    />
+                                    <button
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="p-1.5 rounded hover:bg-white/10 text-white/50 hover:text-emerald-400 transition-colors"
+                                        title="Upload File"
+                                    >
+                                        <i className="fas fa-upload"></i>
+                                    </button>
+                                </>
+                            )}
+                            {!readOnly && onChange && (
+                                <>
+                                    <button onClick={() => formatContent(false)} className="p-1.5 rounded hover:bg-white/10 text-white/50 hover:text-amber-400 transition-colors" title="Beautify">
+                                        <i className="fas fa-indent"></i>
+                                    </button>
+                                    <button onClick={() => formatContent(true)} className="p-1.5 rounded hover:bg-white/10 text-white/50 hover:text-amber-400 transition-colors" title="Minify">
+                                        <i className="fas fa-align-justify"></i>
+                                    </button>
+                                </>
+                            )}
+                            {onClear && (
+                                <button onClick={onClear} className="p-1.5 rounded hover:bg-white/10 text-white/50 hover:text-red-400 transition-colors" title="Clear">
+                                    <i className="fas fa-trash-alt"></i>
+                                </button>
+                            )}
+                            <button onClick={onCopy} className="p-1.5 rounded hover:bg-white/10 text-white/50 hover:text-white transition-colors" title="Copy">
+                                <i className="fas fa-copy"></i>
+                            </button>
+                            {onDownload && (
+                                <button onClick={onDownload} className="p-1.5 rounded hover:bg-white/10 text-white/50 hover:text-cyan-400 transition-colors" title="Download">
+                                    <i className="fas fa-download"></i>
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    {viewMode === 'code' ? (
+                        <textarea
+                            value={value}
+                            onChange={(e) => onChange && onChange(e.target.value)}
+                            readOnly={readOnly}
+                            placeholder={placeholder}
+                            className="flex-1 w-full bg-dark-900/50 p-4 text-sm text-white/90 resize-none focus:outline-none focus:bg-dark-900/80 editor-textarea"
+                            spellCheck="false"
+                        />
+                    ) : (
+                        <div className="flex-1 bg-dark-900/30 relative">
+                            <JsonTreeView data={value} filter={searchTerm} />
+                        </div>
+                    )}
+                    <div className="px-4 py-2 bg-white/5 border-t border-white/10 text-xs text-white/40 flex justify-between">
+                        <span>{value.length} chars</span>
+                        <span>{value.split('\n').length} lines</span>
+                    </div>
+                </div>
+            )
+        };
+
+        const App = () => {
+            const [inputData, setInputData] = useState('');
+            const [outputData, setOutputData] = useState('');
+            const [inputFormat, setInputFormat] = useState('json');
+            const [outputFormat, setOutputFormat] = useState('xml');
+            const [isLoading, setIsLoading] = useState(false);
+            const [error, setError] = useState(null);
+            const [notification, setNotification] = useState(null);
+
+            const showNotification = (msg, type = 'success') => {
+                setNotification({ message: msg, type });
+                setTimeout(() => setNotification(null), 3000);
+            };
+
+            const handleConvert = async () => {
+                if (!inputData.trim()) return;
+                setIsLoading(true);
+                setError(null);
+
+                try {
+                    const response = await fetch('/api/convert-data', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            content: inputData,
+                            inputFormat,
+                            outputFormat
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        setOutputData(result.data);
+                        showNotification('Conversion successful!');
+                    } else {
+                        setError(result.error);
+                        showNotification('Conversion failed', 'error');
+                    }
+                } catch (err) {
+                    setError('Network error occurred');
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+
+            // Auto-convert on format change if data exists
+            useEffect(() => {
+                if (inputData && outputData) {
+                    // Optional: handleConvert(); 
+                    // But maybe user just wants to change format first. Let's keep it manual or debounce it.
+                }
+            }, [inputFormat, outputFormat]);
+
+            const copyToClipboard = (text) => {
+                navigator.clipboard.writeText(text);
+                showNotification('Copied to clipboard');
+            };
+
+            const downloadFile = (content, format) => {
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `converted.${format}`;
+                a.click();
+                URL.revokeObjectURL(url);
+            };
+
+            const swapEditors = () => {
+                setInputData(outputData);
+                setOutputData(inputData);
+                const tempFmt = inputFormat;
+                setInputFormat(outputFormat);
+                setOutputFormat(tempFmt);
+            };
+
+            return (
+                <div className="flex flex-col min-h-screen">
+                    <Header />
+
+                    {notification && (
+                        <div className={`fixed top-20 right-4 z-50 px-5 py-3 rounded-xl shadow-2xl fade-in ${notification.type === 'error' ? 'bg-red-500' : 'bg-emerald-500'} text-white flex items-center gap-2`}>
+                            <i className={`fas fa-${notification.type === 'error' ? 'exclamation' : 'check'}-circle`}></i>
+                            {notification.message}
+                        </div>
+                    )}
+
+                    <main className="flex-1 max-w-[1600px] w-full mx-auto px-4 py-6 flex flex-col lg:flex-row gap-6">
+
+                        <div className="flex-1 flex flex-col min-w-0">
+                            <Editor
+                                title="Input"
+                                value={inputData}
+                                onChange={setInputData}
+                                placeholder="Paste your data here or upload a file..."
+                                format={inputFormat}
+                                onFormatChange={setInputFormat}
+                                onCopy={() => copyToClipboard(inputData)}
+                                onClear={() => setInputData('')}
+                                onUpload={(content, detectedFormat) => {
+                                    setInputData(content);
+                                    setInputFormat(detectedFormat);
+                                    showNotification(`Loaded ${detectedFormat.toUpperCase()} file`);
+                                }}
+                            />
+                        </div>
+
+                        <div className="flex lg:flex-col items-center justify-center gap-4 py-2 lg:py-0">
+                            <button
+                                onClick={handleConvert}
+                                disabled={isLoading || !inputData}
+                                className={`w-12 h-12 lg:w-14 lg:h-14 rounded-full flex items-center justify-center shadow-lg transition-all ${isLoading ? 'bg-dark-700 cursor-not-allowed opacity-50' : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:scale-110 active:scale-95 text-white'}`}
+                                title="Convert"
+                            >
+                                {isLoading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-arrow-right lg:hidden"></i>}
+                                {!isLoading && <i className="fas fa-arrow-right hidden lg:block"></i>}
+                            </button>
+
+                            <button
+                                onClick={swapEditors}
+                                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/50 hover:text-white transition-all"
+                                title="Swap Input/Output"
+                            >
+                                <i className="fas fa-exchange-alt"></i>
+                            </button>
+                        </div>
+
+                        <div className="flex-1 flex flex-col min-w-0">
+                            <Editor
+                                title="Output"
+                                value={outputData}
+                                readOnly={true}
+                                placeholder="Result will appear here..."
+                                format={outputFormat}
+                                onFormatChange={setOutputFormat}
+                                onCopy={() => copyToClipboard(outputData)}
+                                onDownload={() => downloadFile(outputData, outputFormat)}
+                            />
+                            {error && (
+                                <div className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-200 text-sm font-mono fade-in">
+                                    <strong className="block mb-1 text-red-400">Error:</strong>
+                                    {error}
+                                </div>
+                            )}
+                        </div>
+
+                    </main>
+
+                    <footer className="py-6 text-center text-white/30 text-sm">
+                        <p>© {new Date().getFullYear()} Data Converter Pro. Secure & Client-side.</p>
+                    </footer>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('converter-root')).render(<App />);
+    </script>
+</body>
+
+</html>
