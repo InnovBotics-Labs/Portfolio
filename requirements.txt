@@ -25,4 +25,4 @@ PyMuPDF~=1.24.0
 pytesseract~=0.3.10
 # Data Converter dependencies
 PyYAML~=6.0.1
-xmltodict~=0.13.0
+xmltodict

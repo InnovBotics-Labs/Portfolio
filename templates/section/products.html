@@ -17,122 +17,76 @@
             </p>
         </div>
 
-        <!-- Products Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <!-- Launchpad Style Interface -->
+        <div class="max-w-4xl mx-auto relative group">
+            <div
+                class="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-emerald-500/10 blur-3xl rounded-full opacity-20">
+            </div>
 
-            <!-- Product Card 1: PDF Editor -->
-            <a href="{{ url_for('pdf_editor') }}" class="group">
-                <div
-                    class="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:border-rose-500/50 transition-all duration-500 hover:transform hover:-translate-y-3 hover:shadow-2xl hover:shadow-rose-500/20 overflow-hidden">
-                    <!-- Glow Effect -->
-                    <div
-                        class="absolute inset-0 bg-gradient-to-br from-rose-500/0 via-rose-500/0 to-rose-500/0 group-hover:from-rose-500/10 group-hover:via-transparent group-hover:to-rose-500/5 transition-all duration-500 rounded-3xl">
+            <div class="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 sm:p-10 shadow-2xl">
+                <!-- Header inside launchpad -->
+                <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
+                    <div class="flex items-center gap-3">
+                        <div class="flex gap-2">
+                            <div class="w-2.5 h-2.5 rounded-full bg-red-500/80"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-green-500/80"></div>
+                        </div>
+                        <span class="text-white/30 text-xs font-mono ml-2">prabhu-apps</span>
                     </div>
-
-                    <!-- Card Content -->
-                    <div class="relative z-10 flex flex-col items-center text-center">
-                        <!-- Icon Container -->
-                        <div
-                            class="w-24 h-24 sm:w-28 sm:h-28 mb-6 rounded-2xl overflow-hidden shadow-xl shadow-rose-500/20 group-hover:shadow-rose-500/40 transition-all duration-500 group-hover:scale-110 ring-2 ring-rose-400/20 group-hover:ring-rose-400/50">
-                            <img src="{{url_for('static', filename='assets/pdf_editor_icon.png')}}"
-                                alt="PDF Editor Icon"
-                                class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105">
-                        </div>
-
-                        <!-- Product Name -->
-                        <h3
-                            class="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-rose-300 transition-colors duration-300">
-                            Online PDF Editor
-                        </h3>
-
-                        <!-- Description -->
-                        <p class="text-white/50 text-sm sm:text-base mb-4 leading-relaxed">
-                            Upload images and export them as professional PDF documents
-                        </p>
-
-                        <!-- Features Tags -->
-                        <div class="flex flex-wrap justify-center gap-2 mb-4">
-                            <span
-                                class="px-3 py-1 bg-rose-500/20 text-rose-400 text-xs font-medium rounded-full border border-rose-500/20">
-                                <i class="fas fa-upload mr-1"></i>Upload
-                            </span>
-                            <span
-                                class="px-3 py-1 bg-rose-500/20 text-rose-400 text-xs font-medium rounded-full border border-rose-500/20">
-                                <i class="fas fa-file-pdf mr-1"></i>Export PDF
-                            </span>
-                            <span
-                                class="px-3 py-1 bg-rose-500/20 text-rose-400 text-xs font-medium rounded-full border border-rose-500/20">
-                                <i class="fas fa-images mr-1"></i>Image Support
-                            </span>
-                        </div>
-
-                        <!-- CTA -->
-                        <div
-                            class="flex items-center gap-2 text-rose-400 font-medium text-sm group-hover:text-rose-300 transition-colors">
-                            <span>Try Now</span>
-                            <i
-                                class="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform duration-300"></i>
-                        </div>
-                    </div>
+                    <span class="text-white/30 text-xs font-mono">v1.0.0</span>
                 </div>
-            </a>
 
-            <!-- Product Card 2: JSON/XML Converter -->
-            <a href="{{ url_for('data_converter') }}" class="group">
-                <div
-                    class="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:border-cyan-500/50 transition-all duration-500 hover:transform hover:-translate-y-3 hover:shadow-2xl hover:shadow-cyan-500/20 overflow-hidden">
-                    <!-- Glow Effect -->
+                <!-- App Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-10">
+
+                    <!-- App 1: PDF Editor -->
+                    <a href="{{ url_for('pdf_editor') }}" class="group/app flex flex-col items-center gap-3">
+                        <div
+                            class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-rose-500 to-red-600 shadow-lg shadow-rose-500/30 flex items-center justify-center transform transition-all duration-300 group-hover/app:scale-110 group-hover/app:translate-y-[-5px] border border-white/10">
+                            <img src="{{url_for('static', filename='assets/pdf_editor_icon-removebg-preview.png')}}"
+                                alt="PDF Editor"
+                                class="w-10 h-10 sm:w-12 sm:h-12 object-contain filter drop-shadow-md" />
+                        </div>
+                        <span
+                            class="text-white/80 text-sm font-medium tracking-wide group-hover/app:text-white transition-colors">PDF
+                            Editor</span>
+                    </a>
+
+                    <!-- App 2: Data Converter -->
+                    <a href="{{ url_for('data_converter') }}" class="group/app flex flex-col items-center gap-3">
+                        <div
+                            class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/20 transform transition-all duration-300 group-hover/app:scale-110 group-hover/app:translate-y-[-5px] group-hover/app:shadow-cyan-500/20">
+                            <img src="{{url_for('static', filename='assets/data_converter_icon_red_v5.png')}}"
+                                alt="Converter" class="w-full h-full object-cover" />
+                        </div>
+                        <span
+                            class="text-white/80 text-sm font-medium tracking-wide group-hover/app:text-white transition-colors">Converter</span>
+                    </a>
+
+                    <!-- App 3: Budget Analyzer (New) -->
+                    <a href="#" class="group/app flex flex-col items-center gap-3">
+                        <div
+                            class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/30 flex items-center justify-center transform transition-all duration-300 group-hover/app:scale-110 group-hover/app:translate-y-[-5px] border border-white/10">
+                            <i class="fas fa-chart-pie text-white text-3xl sm:text-4xl drop-shadow-md"></i>
+                        </div>
+                        <span
+                            class="text-white/80 text-sm font-medium tracking-wide group-hover/app:text-white transition-colors">Budget
+                            AI</span>
+                    </a>
+
+                    <!-- App 4: Placeholder -->
                     <div
-                        class="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-cyan-500/0 to-cyan-500/0 group-hover:from-cyan-500/10 group-hover:via-transparent group-hover:to-cyan-500/5 transition-all duration-500 rounded-3xl">
+                        class="flex flex-col items-center gap-3 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all cursor-not-allowed">
+                        <div
+                            class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white/5 border-2 border-dashed border-white/20 flex items-center justify-center">
+                            <i class="fas fa-plus text-white/30 text-2xl"></i>
+                        </div>
+                        <span class="text-white/30 text-sm font-medium">Coming Soon</span>
                     </div>
 
-                    <!-- Card Content -->
-                    <div class="relative z-10 flex flex-col items-center text-center">
-                        <!-- Icon Container -->
-                        <div
-                            class="w-24 h-24 sm:w-28 sm:h-28 mb-6 rounded-2xl overflow-hidden shadow-xl shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-all duration-500 group-hover:scale-110 ring-2 ring-cyan-400/20 group-hover:ring-cyan-400/50">
-                            <img src="{{url_for('static', filename='assets/converter_icon.png')}}" alt="Converter Icon"
-                                class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105">
-                        </div>
-
-                        <!-- Product Name -->
-                        <h3
-                            class="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors duration-300">
-                            Data Converter
-                        </h3>
-
-                        <!-- Description -->
-                        <p class="text-white/50 text-sm sm:text-base mb-4 leading-relaxed">
-                            Seamlessly convert between JSON and XML formats with ease
-                        </p>
-
-                        <!-- Features Tags -->
-                        <div class="flex flex-wrap justify-center gap-2 mb-4">
-                            <span
-                                class="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs font-medium rounded-full border border-cyan-500/20">
-                                <i class="fas fa-code mr-1"></i>JSON
-                            </span>
-                            <span
-                                class="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs font-medium rounded-full border border-cyan-500/20">
-                                <i class="fas fa-exchange-alt mr-1"></i>Convert
-                            </span>
-                            <span
-                                class="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs font-medium rounded-full border border-cyan-500/20">
-                                <i class="fas fa-file-code mr-1"></i>XML
-                            </span>
-                        </div>
-
-                        <!-- CTA -->
-                        <div
-                            class="flex items-center gap-2 text-cyan-400 font-medium text-sm group-hover:text-cyan-300 transition-colors">
-                            <span>Try Now</span>
-                            <i
-                                class="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform duration-300"></i>
-                        </div>
-                    </div>
                 </div>
-            </a>
-
+            </div>
         </div>
 
         <!-- View All Products Link -->

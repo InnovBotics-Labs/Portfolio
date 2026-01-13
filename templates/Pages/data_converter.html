@@ -12,8 +12,11 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { dark: { 900: '#0a0f1f', 800: '#111827', 700: '#1f2937', 600: '#374151' } },
-                    fontFamily: { 'sans': ['Inter', 'system-ui', 'sans-serif'], 'code': ['Fira Code', 'monospace'] },
+                    colors: {
+                        primary: { 50: '#fef2f2', 100: '#fee2e2', 200: '#fecaca', 300: '#fca5a5', 400: '#f87171', 500: '#ef4444', 600: '#dc2626', 700: '#b91c1c', 800: '#991b1b', 900: '#7f1d1d', 950: '#450a0a' },
+                        dark: { 900: '#0a0f1f', 800: '#111827', 700: '#1f2937', 600: '#374151' }
+                    },
+                    fontFamily: { 'sans': ['Inter', 'system-ui', 'sans-serif'], 'display': ['Outfit', 'sans-serif'], 'code': ['Fira Code', 'monospace'] },
                 }
             }
         }
@@ -21,7 +24,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -60,6 +63,52 @@
             }
         }
 
+        /* Custom Scrollbar for sleek look */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            border: 2px solid rgba(0, 0, 0, 0);
+            /* Creates padding effect */
+            background-clip: content-box;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* IDE Layout Styles */
+        .ide-panel {
+            background: #0d1117;
+            /* VS Code dark bg */
+            border: 1px solid #30363d;
+        }
+
+        .ide-tab {
+            background: #0d1117;
+            border-top: 2px solid #58a6ff;
+            /* Active tab indicator color */
+            color: #c9d1d9;
+        }
+
+        .ide-toolbar {
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .empty-state-pattern {
+            background-image: radial-gradient(#30363d 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
         /* Tree View Styles */
         .tree-key {
             color: #569CD6;
@@ -96,25 +145,28 @@
 <body class="text-white/90 font-sans antialiased flex flex-col min-h-screen">
     <div id="converter-root" class="flex-1 flex flex-col"></div>
 
+    <script>
+        window.converterIconUrl = "{{ url_for('static', filename='assets/data_converter_icon_red_v5.png') }}";
+    </script>
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
         const Header = () => (
-            <header className="sticky top-0 z-50 bg-dark-900/80 backdrop-blur-lg border-b border-white/10">
+            <header className="sticky top-0 z-50 transition-all duration-300 bg-transparent backdrop-blur-sm border-b border-white/5">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
-                                <i className="fas fa-exchange-alt text-white text-lg"></i>
+                            <div className="w-10 h-10 flex items-center justify-center rounded-xl overflow-hidden filter drop-shadow-[0_0_15px_rgba(248,113,113,0.3)]">
+                                <img src={window.converterIconUrl} className="w-full h-full object-cover" alt="Logo" />
                             </div>
                             <div>
-                                <h1 className="font-bold text-lg text-white">Data Converter</h1>
+                                <h1 className="font-display font-bold text-lg text-white">Data Converter</h1>
                                 <p className="text-xs text-white/50 hidden sm:block">JSON · XML · CSV · YAML</p>
                             </div>
                         </div>
-                        <a href="/" className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-all">
-                            <i className="fas fa-arrow-left text-sm"></i>
-                            <span className="hidden sm:inline">Back</span>
+                        <a href="/" className="px-4 py-1.5 rounded-full bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white text-sm font-semibold shadow-lg shadow-primary-500/20 hover:shadow-primary-500/40 transition-all duration-300 transform hover:scale-105 flex items-center gap-2 group">
+                            <i className="fas fa-arrow-left text-xs group-hover:-translate-x-1 transition-transform"></i>
+                            <span>Home</span>
                         </a>
                     </div>
                 </div>
@@ -288,41 +340,34 @@
             const formatContent = (minify = false) => {
                 if (!value) return;
                 try {
-                    // Try JSON first
                     const parsed = JSON.parse(value);
                     const formatted = JSON.stringify(parsed, null, minify ? 0 : 2);
                     onChange(formatted);
-                } catch (e) {
-                    // For non-JSON, we skip formatting for now to avoid breaking things
-                    // or could add a simple regex XML formatter in future
-                }
+                } catch (e) { }
             };
 
-            return (
-                <div className="flex-1 flex flex-col glass-panel rounded-xl overflow-hidden shadow-2xl h-[600px] sm:h-[calc(100vh-240px)] min-h-[400px]">
-                    <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-b border-white/10">
-                        <div className="flex items-center gap-3">
-                            <span className="text-sm font-medium text-white/70">{title}</span>
-                            <div className="flex bg-dark-800 rounded-lg p-0.5 border border-white/10">
-                                <button onClick={() => setViewMode('code')} className={`px-2 py-1 rounded text-xs transition-all ${viewMode === 'code' ? 'bg-white/10 text-white shadow' : 'text-white/40 hover:text-white'}`}><i className="fas fa-code mr-1"></i>Code</button>
-                                <button onClick={() => setViewMode('tree')} className={`px-2 py-1 rounded text-xs transition-all ${viewMode === 'tree' ? 'bg-white/10 text-white shadow' : 'text-white/40 hover:text-white'}`}><i className="fas fa-project-diagram mr-1"></i>Tree</button>
-                            </div>
+            const lineCount = value ? value.split('\n').length : 0;
+            const charCount = value ? value.length : 0;
+            const isEmpty = !value || value.trim() === '';
 
-                            {/* Search Input */}
-                            <div className="relative group mx-2">
-                                <i className="fas fa-search absolute left-2 top-1/2 -translate-y-1/2 text-xs text-white/30 group-focus-within:text-cyan-400"></i>
-                                <input
-                                    type="text"
-                                    placeholder="Search tree..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className={`bg-white/5 border border-white/10 rounded-lg py-1 pl-7 pr-2 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-all font-sans ${viewMode === 'tree' ? 'w-24 focus:w-40 opacity-100' : 'w-0 p-0 border-0 opacity-0 pointer-events-none'}`}
-                                />
-                            </div>
+            return (
+                <div className="flex-1 flex flex-col ide-panel rounded-xl overflow-hidden shadow-2xl h-[600px] sm:h-[calc(100vh-240px)] min-h-[400px]">
+
+                    {/* 1. IDE Tab Bar */}
+                    <div className="flex items-center bg-[#010409] border-b border-[#30363d]">
+                        <div className="flex items-center px-4 py-2 ide-tab border-r border-[#30363d] text-xs font-medium gap-2">
+                            <i className={`fas fa-file-${format === 'json' ? 'code' : 'alt'} text-blue-400`}></i>
+                            <span>{title === 'Input' ? 'source' : 'result'}.{format}</span>
+                            <i className="fas fa-times text-white/20 hover:text-white cursor-pointer ml-2 text-[10px]" onClick={onClear}></i>
+                        </div>
+                        <div className="flex-1"></div>
+
+                        {/* Format Selector in Tab Bar */}
+                        <div className="px-2">
                             <select
                                 value={format}
                                 onChange={(e) => onFormatChange(e.target.value)}
-                                className="bg-dark-800 border border-white/20 rounded-md text-xs px-2 py-1 text-white focus:outline-none focus:border-cyan-500"
+                                className="bg-transparent text-xs text-white/50 hover:text-white focus:outline-none cursor-pointer"
                             >
                                 <option value="json">JSON</option>
                                 <option value="xml">XML</option>
@@ -330,67 +375,102 @@
                                 <option value="yaml">YAML</option>
                             </select>
                         </div>
+                    </div>
+
+                    {/* 2. Secondary Toolbar */}
+                    <div className="ide-toolbar flex items-center justify-between px-3 py-1.5 min-h-[36px]">
                         <div className="flex items-center gap-2">
+                            {/* View Toggles */}
+                            <div className="flex bg-[#30363d]/50 rounded p-0.5">
+                                <button onClick={() => setViewMode('code')} className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider transition-all ${viewMode === 'code' ? 'bg-[#58a6ff] text-white shadow-sm' : 'text-white/40 hover:text-white'}`}>Code</button>
+                                <button onClick={() => setViewMode('tree')} className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider transition-all ${viewMode === 'tree' ? 'bg-[#58a6ff] text-white shadow-sm' : 'text-white/40 hover:text-white'}`}>Tree</button>
+                            </div>
+
+                            {/* Search (Only in Tree) */}
+                            <div className={`transition-all duration-300 overflow-hidden flex items-center ${viewMode === 'tree' ? 'w-32 opacity-100 ml-2' : 'w-0 opacity-0'}`}>
+                                <div className="relative w-full">
+                                    <i className="fas fa-search absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-white/30"></i>
+                                    <input
+                                        type="text"
+                                        placeholder="Filter..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full bg-[#0d1117] border border-[#30363d] rounded-sm py-0.5 pl-6 pr-1 text-[10px] text-white focus:outline-none focus:border-[#58a6ff]"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-1">
                             {onUpload && (
                                 <>
-                                    <input
-                                        ref={fileInputRef}
-                                        type="file"
-                                        accept=".json,.xml,.csv,.yaml,.yml"
-                                        onChange={handleFileChange}
-                                        className="hidden"
-                                    />
-                                    <button
-                                        onClick={() => fileInputRef.current?.click()}
-                                        className="p-1.5 rounded hover:bg-white/10 text-white/50 hover:text-emerald-400 transition-colors"
-                                        title="Upload File"
-                                    >
-                                        <i className="fas fa-upload"></i>
+                                    <input ref={fileInputRef} type="file" accept=".json,.xml,.csv,.yaml,.yml" onChange={handleFileChange} className="hidden" />
+                                    <button onClick={() => fileInputRef.current?.click()} className="p-1.5 rounded hover:bg-white/10 text-white/50 hover:text-emerald-400 transition-colors" title="Upload File">
+                                        <i className="fas fa-upload text-xs"></i>
                                     </button>
                                 </>
                             )}
-                            {!readOnly && onChange && (
+                            {!readOnly && onChange && !isEmpty && (
                                 <>
                                     <button onClick={() => formatContent(false)} className="p-1.5 rounded hover:bg-white/10 text-white/50 hover:text-amber-400 transition-colors" title="Beautify">
-                                        <i className="fas fa-indent"></i>
+                                        <i className="fas fa-indent text-xs"></i>
                                     </button>
                                     <button onClick={() => formatContent(true)} className="p-1.5 rounded hover:bg-white/10 text-white/50 hover:text-amber-400 transition-colors" title="Minify">
-                                        <i className="fas fa-align-justify"></i>
+                                        <i className="fas fa-align-justify text-xs"></i>
                                     </button>
                                 </>
                             )}
-                            {onClear && (
-                                <button onClick={onClear} className="p-1.5 rounded hover:bg-white/10 text-white/50 hover:text-red-400 transition-colors" title="Clear">
-                                    <i className="fas fa-trash-alt"></i>
-                                </button>
-                            )}
                             <button onClick={onCopy} className="p-1.5 rounded hover:bg-white/10 text-white/50 hover:text-white transition-colors" title="Copy">
-                                <i className="fas fa-copy"></i>
+                                <i className="fas fa-copy text-xs"></i>
                             </button>
                             {onDownload && (
                                 <button onClick={onDownload} className="p-1.5 rounded hover:bg-white/10 text-white/50 hover:text-cyan-400 transition-colors" title="Download">
-                                    <i className="fas fa-download"></i>
+                                    <i className="fas fa-download text-xs"></i>
                                 </button>
                             )}
                         </div>
                     </div>
-                    {viewMode === 'code' ? (
-                        <textarea
-                            value={value}
-                            onChange={(e) => onChange && onChange(e.target.value)}
-                            readOnly={readOnly}
-                            placeholder={placeholder}
-                            className="flex-1 w-full bg-dark-900/50 p-4 text-sm text-white/90 resize-none focus:outline-none focus:bg-dark-900/80 editor-textarea"
-                            spellCheck="false"
-                        />
-                    ) : (
-                        <div className="flex-1 bg-dark-900/30 relative">
-                            <JsonTreeView data={value} filter={searchTerm} />
+
+                    {/* 3. Editor Content */}
+                    <div className="flex-1 relative bg-[#0d1117] overflow-hidden">
+                        {isEmpty && viewMode === 'code' ? (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center text-white/20 empty-state-pattern select-none">
+                                <i className="fas fa-code text-4xl mb-4 opacity-50"></i>
+                                <p className="text-sm font-medium">Paste {format.toUpperCase()} here</p>
+                                {onUpload && (
+                                    <button onClick={() => fileInputRef.current?.click()} className="mt-4 px-4 py-2 rounded-full bg-[#161b22] border border-[#30363d] hover:border-[#58a6ff] hover:text-[#58a6ff] transition-all text-xs flex items-center gap-2">
+                                        <i className="fas fa-upload"></i>
+                                        <span>Or Upload File</span>
+                                    </button>
+                                )}
+                            </div>
+                        ) : null}
+
+                        {viewMode === 'code' ? (
+                            <textarea
+                                value={value}
+                                onChange={(e) => onChange && onChange(e.target.value)}
+                                readOnly={readOnly}
+                                className={`w-full h-full bg-transparent p-4 text-sm text-[#c9d1d9] resize-none focus:outline-none editor-textarea ${isEmpty ? 'opacity-0 relative z-10' : ''}`}
+                                spellCheck="false"
+                            />
+                        ) : (
+                            <div className="w-full h-full bg-[#0d1117]">
+                                <JsonTreeView data={value} filter={searchTerm} />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* 4. Status Bar */}
+                    <div className="px-3 py-1 bg-[#161b22] border-t border-[#30363d] text-[10px] text-white/40 flex justify-between select-none font-code">
+                        <div className="flex gap-4">
+                            <span>Ln {lineCount}</span>
+                            <span>Col {charCount}</span>
                         </div>
-                    )}
-                    <div className="px-4 py-2 bg-white/5 border-t border-white/10 text-xs text-white/40 flex justify-between">
-                        <span>{value.length} chars</span>
-                        <span>{value.split('\n').length} lines</span>
+                        <div className="flex gap-4">
+                            <span>UTF-8</span>
+                            <span>{format.toUpperCase()}</span>
+                        </div>
                     </div>
                 </div>
             )
@@ -474,7 +554,7 @@
             };
 
             return (
-                <div className="flex flex-col min-h-screen">
+                <div className="flex flex-col h-screen overflow-hidden">
                     <Header />
 
                     {notification && (
@@ -484,9 +564,10 @@
                         </div>
                     )}
 
-                    <main className="flex-1 max-w-[1600px] w-full mx-auto px-4 py-6 flex flex-col lg:flex-row gap-6">
+                    <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
 
-                        <div className="flex-1 flex flex-col min-w-0">
+                        {/* LEFT PANE */}
+                        <div className="flex-1 min-w-0 h-full flex flex-col">
                             <Editor
                                 title="Input"
                                 value={inputData}
@@ -504,27 +585,28 @@
                             />
                         </div>
 
-                        <div className="flex lg:flex-col items-center justify-center gap-4 py-2 lg:py-0">
+                        {/* CENTRAL CONTROL BAR */}
+                        <div className="w-full lg:w-12 bg-[#010409] border-y lg:border-y-0 lg:border-x border-[#30363d] flex lg:flex-col items-center justify-center gap-6 p-2 z-10 shadow-xl">
                             <button
                                 onClick={handleConvert}
                                 disabled={isLoading || !inputData}
-                                className={`w-12 h-12 lg:w-14 lg:h-14 rounded-full flex items-center justify-center shadow-lg transition-all ${isLoading ? 'bg-dark-700 cursor-not-allowed opacity-50' : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:scale-110 active:scale-95 text-white'}`}
+                                className={`w-8 h-8 lg:w-8 lg:h-8 rounded-full flex items-center justify-center transition-all ${isLoading ? 'text-white/20 cursor-not-allowed' : 'text-blue-400 hover:text-white hover:bg-white/10 hover:scale-110'}`}
                                 title="Convert"
                             >
-                                {isLoading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-arrow-right lg:hidden"></i>}
-                                {!isLoading && <i className="fas fa-arrow-right hidden lg:block"></i>}
+                                <i className={`fas fa-${isLoading ? 'spinner fa-spin' : 'play'} text-lg`}></i>
                             </button>
 
                             <button
                                 onClick={swapEditors}
-                                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/50 hover:text-white transition-all"
+                                className="w-8 h-8 rounded-full flex items-center justify-center text-white/20 hover:text-white hover:bg-white/10 transition-all"
                                 title="Swap Input/Output"
                             >
                                 <i className="fas fa-exchange-alt"></i>
                             </button>
                         </div>
 
-                        <div className="flex-1 flex flex-col min-w-0">
+                        {/* RIGHT PANE */}
+                        <div className="flex-1 min-w-0 h-full flex flex-col relative">
                             <Editor
                                 title="Output"
                                 value={outputData}
@@ -536,18 +618,14 @@
                                 onDownload={() => downloadFile(outputData, outputFormat)}
                             />
                             {error && (
-                                <div className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-200 text-sm font-mono fade-in">
-                                    <strong className="block mb-1 text-red-400">Error:</strong>
+                                <div className="absolute bottom-10 left-4 right-4 p-3 bg-red-900/80 border border-red-500/50 backdrop-blur rounded text-red-100 text-xs font-mono fade-in z-50 shadow-xl">
+                                    <strong className="block mb-1 text-red-300">Error:</strong>
                                     {error}
                                 </div>
                             )}
                         </div>
 
                     </main>
-
-                    <footer className="py-6 text-center text-white/30 text-sm">
-                        <p>© {new Date().getFullYear()} Data Converter Pro. Secure & Client-side.</p>
-                    </footer>
                 </div>
             );
         };
