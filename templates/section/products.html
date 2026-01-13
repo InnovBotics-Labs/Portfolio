@@ -1,0 +1,147 @@
+<!-- Products Section -->
+<section id="products" class="relative z-10 py-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Section Header -->
+        <div class="text-center mb-16">
+            <span
+                class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-950/40 border border-emerald-500/20 text-emerald-400 text-sm font-medium mb-4">
+                <i class="fas fa-cube text-xs"></i>
+                <span>Web Tools</span>
+            </span>
+            <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
+                My <span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-500">Products</span>
+            </h2>
+            <p class="mt-4 text-white/60 text-lg max-w-2xl mx-auto">
+                Explore my collection of web-based tools designed to simplify your workflow
+            </p>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+
+            <!-- Product Card 1: PDF Editor -->
+            <a href="{{ url_for('pdf_editor') }}" class="group">
+                <div
+                    class="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:border-rose-500/50 transition-all duration-500 hover:transform hover:-translate-y-3 hover:shadow-2xl hover:shadow-rose-500/20 overflow-hidden">
+                    <!-- Glow Effect -->
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-rose-500/0 via-rose-500/0 to-rose-500/0 group-hover:from-rose-500/10 group-hover:via-transparent group-hover:to-rose-500/5 transition-all duration-500 rounded-3xl">
+                    </div>
+
+                    <!-- Card Content -->
+                    <div class="relative z-10 flex flex-col items-center text-center">
+                        <!-- Icon Container -->
+                        <div
+                            class="w-24 h-24 sm:w-28 sm:h-28 mb-6 rounded-2xl overflow-hidden shadow-xl shadow-rose-500/20 group-hover:shadow-rose-500/40 transition-all duration-500 group-hover:scale-110 ring-2 ring-rose-400/20 group-hover:ring-rose-400/50">
+                            <img src="{{url_for('static', filename='assets/pdf_editor_icon.png')}}"
+                                alt="PDF Editor Icon"
+                                class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105">
+                        </div>
+
+                        <!-- Product Name -->
+                        <h3
+                            class="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-rose-300 transition-colors duration-300">
+                            Online PDF Editor
+                        </h3>
+
+                        <!-- Description -->
+                        <p class="text-white/50 text-sm sm:text-base mb-4 leading-relaxed">
+                            Upload images and export them as professional PDF documents
+                        </p>
+
+                        <!-- Features Tags -->
+                        <div class="flex flex-wrap justify-center gap-2 mb-4">
+                            <span
+                                class="px-3 py-1 bg-rose-500/20 text-rose-400 text-xs font-medium rounded-full border border-rose-500/20">
+                                <i class="fas fa-upload mr-1"></i>Upload
+                            </span>
+                            <span
+                                class="px-3 py-1 bg-rose-500/20 text-rose-400 text-xs font-medium rounded-full border border-rose-500/20">
+                                <i class="fas fa-file-pdf mr-1"></i>Export PDF
+                            </span>
+                            <span
+                                class="px-3 py-1 bg-rose-500/20 text-rose-400 text-xs font-medium rounded-full border border-rose-500/20">
+                                <i class="fas fa-images mr-1"></i>Image Support
+                            </span>
+                        </div>
+
+                        <!-- CTA -->
+                        <div
+                            class="flex items-center gap-2 text-rose-400 font-medium text-sm group-hover:text-rose-300 transition-colors">
+                            <span>Try Now</span>
+                            <i
+                                class="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform duration-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Product Card 2: JSON/XML Converter -->
+            <a href="#" class="group">
+                <div
+                    class="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:border-cyan-500/50 transition-all duration-500 hover:transform hover:-translate-y-3 hover:shadow-2xl hover:shadow-cyan-500/20 overflow-hidden">
+                    <!-- Glow Effect -->
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-cyan-500/0 to-cyan-500/0 group-hover:from-cyan-500/10 group-hover:via-transparent group-hover:to-cyan-500/5 transition-all duration-500 rounded-3xl">
+                    </div>
+
+                    <!-- Card Content -->
+                    <div class="relative z-10 flex flex-col items-center text-center">
+                        <!-- Icon Container -->
+                        <div
+                            class="w-24 h-24 sm:w-28 sm:h-28 mb-6 rounded-2xl overflow-hidden shadow-xl shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-all duration-500 group-hover:scale-110 ring-2 ring-cyan-400/20 group-hover:ring-cyan-400/50">
+                            <img src="{{url_for('static', filename='assets/converter_icon.png')}}" alt="Converter Icon"
+                                class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105">
+                        </div>
+
+                        <!-- Product Name -->
+                        <h3
+                            class="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors duration-300">
+                            Data Converter
+                        </h3>
+
+                        <!-- Description -->
+                        <p class="text-white/50 text-sm sm:text-base mb-4 leading-relaxed">
+                            Seamlessly convert between JSON and XML formats with ease
+                        </p>
+
+                        <!-- Features Tags -->
+                        <div class="flex flex-wrap justify-center gap-2 mb-4">
+                            <span
+                                class="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs font-medium rounded-full border border-cyan-500/20">
+                                <i class="fas fa-code mr-1"></i>JSON
+                            </span>
+                            <span
+                                class="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs font-medium rounded-full border border-cyan-500/20">
+                                <i class="fas fa-exchange-alt mr-1"></i>Convert
+                            </span>
+                            <span
+                                class="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs font-medium rounded-full border border-cyan-500/20">
+                                <i class="fas fa-file-code mr-1"></i>XML
+                            </span>
+                        </div>
+
+                        <!-- CTA -->
+                        <div
+                            class="flex items-center gap-2 text-cyan-400 font-medium text-sm group-hover:text-cyan-300 transition-colors">
+                            <span>Try Now</span>
+                            <i
+                                class="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform duration-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- View All Products Link -->
+        <div class="text-center mt-12">
+            <a href="#"
+                class="inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-gradient-to-r from-amber-500/20 to-emerald-500/20 border border-amber-500/30 text-white font-medium hover:from-amber-500/30 hover:to-emerald-500/30 hover:border-amber-400/50 transition-all duration-300 group">
+                <span>View All Products</span>
+                <i class="fas fa-th-large transform group-hover:rotate-12 transition-transform duration-300"></i>
+            </a>
+        </div>
+    </div>
+</section>

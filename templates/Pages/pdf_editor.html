@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta name="description"
+        content="Free Online PDF Editor - Upload, edit, sign, annotate, and export PDFs. No signup required.">
+    <title>Online PDF Editor - Prabhu's Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { dark: { 900: '#0a0f1f', 800: '#111827', 700: '#1f2937', 600: '#374151' } },
+                    fontFamily: { 'sans': ['Inter', 'system-ui', 'sans-serif'], 'display': ['Outfit', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0f1f 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+        }
+
+        .dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .page-card:hover .page-actions {
+            opacity: 1;
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(244, 63, 94, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(244, 63, 94, 0.6);
+            }
+        }
+
+        .rotate-90 {
+            transform: rotate(90deg);
+        }
+
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
+
+        .rotate-270 {
+            transform: rotate(270deg);
+        }
+
+        .modal-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .modal-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .signature-canvas {
+            touch-action: none;
+        }
+    </style>
+</head>
+
+<body class="text-white/90 font-sans antialiased">
+    {% raw %}
+    <div id="pdf-editor-root" class="min-h-screen flex flex-col"></div>
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+
+        const Header = () => (
+            <header className="sticky top-0 z-50 bg-dark-900/80 backdrop-blur-lg border-b border-white/10">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-16">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center shadow-lg shadow-rose-500/30"><i className="fas fa-file-pdf text-white text-lg"></i></div>
+                            <div><h1 className="font-display font-bold text-lg text-white">PDF Editor Pro</h1><p className="text-xs text-white/50 hidden sm:block">Edit, Sign, Annotate, Export</p></div>
+                        </div>
+                        <a href="/" className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-all"><i className="fas fa-arrow-left text-sm"></i><span className="hidden sm:inline">Back</span></a>
+                    </div>
+                </div>
+            </header>
+        );
+
+        const PageCard = ({ page, index, onDelete, onRotate, onDuplicate, onDragStart, onDragOver, onDrop, isDragging }) => {
+            const rotationClass = page.rotation === 90 ? 'rotate-90' : page.rotation === 180 ? 'rotate-180' : page.rotation === 270 ? 'rotate-270' : '';
+            return (
+                <div draggable onDragStart={(e) => onDragStart(e, index)} onDragOver={onDragOver} onDrop={(e) => onDrop(e, index)} className={`page-card relative bg-gradient-to-br from-white/10 to-white/5 rounded-xl border border-white/10 hover:border-rose-500/50 transition-all cursor-grab group ${isDragging ? 'dragging' : ''} fade-in`}>
+                    <div className="absolute top-2 left-2 z-10 w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg">{index + 1}</div>
+                    <div className="page-actions absolute top-2 right-2 z-10 flex gap-1 opacity-0 transition-opacity">
+                        <button onClick={() => onRotate(page.id)} className="w-6 h-6 bg-blue-500/80 hover:bg-blue-500 rounded-full flex items-center justify-center text-white text-xs shadow-lg" title="Rotate"><i className="fas fa-redo"></i></button>
+                        <button onClick={() => onDuplicate(page.id)} className="w-6 h-6 bg-green-500/80 hover:bg-green-500 rounded-full flex items-center justify-center text-white text-xs shadow-lg" title="Duplicate"><i className="fas fa-copy"></i></button>
+                        <button onClick={() => onDelete(page.id)} className="w-6 h-6 bg-red-500/80 hover:bg-red-500 rounded-full flex items-center justify-center text-white text-xs shadow-lg" title="Delete"><i className="fas fa-times"></i></button>
+                    </div>
+                    <div className="aspect-[3/4] rounded-t-xl overflow-hidden bg-white/5">{page.thumbnail ? <img src={page.thumbnail} className={`w-full h-full object-contain bg-white ${rotationClass}`} /> : <div className="w-full h-full flex items-center justify-center"><i className="fas fa-file-pdf text-3xl text-rose-400/50"></i></div>}</div>
+                    <div className="p-2 text-center"><p className="text-white/50 text-xs">{page.type === 'image' ? 'IMG' : 'PDF'}{page.rotation > 0 && <span className="ml-1 text-blue-400">↻{page.rotation}°</span>}</p></div>
+                </div>
+            );
+        };
+
+        const UploadZone = ({ onFilesSelected, isProcessing, hasPages }) => {
+            const [isDragOver, setIsDragOver] = useState(false);
+            const fileInputRef = useRef(null);
+            return (
+                <div onDrop={(e) => { e.preventDefault(); setIsDragOver(false); onFilesSelected(Array.from(e.dataTransfer.files)); }} onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }} onDragLeave={() => setIsDragOver(false)} onClick={() => !isProcessing && fileInputRef.current?.click()} className={`border-2 border-dashed rounded-2xl text-center cursor-pointer transition-all ${hasPages ? 'p-4' : 'p-10'} ${isDragOver ? 'border-rose-500 bg-rose-500/10' : 'border-white/20 hover:border-rose-500/50'} ${isProcessing ? 'opacity-50' : ''}`}>
+                    <input ref={fileInputRef} type="file" multiple accept="image/*,.pdf" onChange={(e) => { onFilesSelected(Array.from(e.target.files)); e.target.value = ''; }} className="hidden" disabled={isProcessing} />
+                    {isProcessing ? <div className="flex items-center justify-center gap-3"><div className="w-8 h-8 border-3 border-rose-500 border-t-transparent rounded-full spinner"></div><p className="text-white/70">Processing...</p></div> : <div className={`flex ${hasPages ? 'flex-row items-center justify-center gap-3' : 'flex-col items-center gap-3'}`}><div className={`rounded-full bg-rose-500/20 flex items-center justify-center ${hasPages ? 'w-10 h-10' : 'w-14 h-14'}`}><i className={`fas fa-cloud-upload-alt text-rose-400 ${hasPages ? 'text-lg' : 'text-xl'}`}></i></div><div><h3 className={`font-bold text-white ${hasPages ? 'text-sm' : 'text-base'}`}>{hasPages ? 'Add more' : 'Drop files or click'}</h3>{!hasPages && <p className="text-white/50 text-sm">PNG, JPG, PDF</p>}</div></div>}
+                </div>
+            );
+        };
+
+        const Toggle = ({ enabled, onChange, label, icon, color = 'rose' }) => (
+            <button onClick={() => onChange(!enabled)} className={`w-full flex items-center justify-between px-4 py-3 rounded-lg border transition-all ${enabled ? `bg-${color}-500/20 border-${color}-500/50` : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
+                <div className="flex items-center gap-3"><i className={`fas fa-${icon} ${enabled ? `text-${color}-400` : 'text-white/50'}`}></i><span className={enabled ? 'text-white' : 'text-white/70'}>{label}</span></div>
+                <div className={`w-10 h-6 rounded-full transition-all ${enabled ? `bg-${color}-500` : 'bg-white/20'}`}><div className={`w-4 h-4 mt-1 rounded-full bg-white shadow ${enabled ? 'ml-5' : 'ml-1'}`}></div></div>
+            </button>
+        );
+
+        const SignatureCanvas = ({ onSignatureChange }) => {
+            const canvasRef = useRef(null);
+            const [isDrawing, setIsDrawing] = useState(false);
+            const getCoords = (e) => {
+                const rect = canvasRef.current.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return { x: clientX - rect.left, y: clientY - rect.top };
+            };
+            const startDrawing = (e) => { e.preventDefault(); setIsDrawing(true); const ctx = canvasRef.current.getContext('2d'); ctx.beginPath(); const { x, y } = getCoords(e); ctx.moveTo(x, y); };
+            const draw = (e) => { if (!isDrawing) return; e.preventDefault(); const ctx = canvasRef.current.getContext('2d'); const { x, y } = getCoords(e); ctx.lineTo(x, y); ctx.stroke(); };
+            const stopDrawing = () => { setIsDrawing(false); onSignatureChange(canvasRef.current.toDataURL()); };
+            const clearCanvas = () => { const ctx = canvasRef.current.getContext('2d'); ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height); onSignatureChange(null); };
+            useEffect(() => { const ctx = canvasRef.current.getContext('2d'); ctx.strokeStyle = '#1f2937'; ctx.lineWidth = 2; ctx.lineCap = 'round'; }, []);
+            return (
+                <div className="space-y-2">
+                    <canvas ref={canvasRef} width={280} height={100} className="signature-canvas w-full h-24 bg-white rounded-lg border border-white/20 cursor-crosshair" onMouseDown={startDrawing} onMouseMove={draw} onMouseUp={stopDrawing} onMouseLeave={stopDrawing} onTouchStart={startDrawing} onTouchMove={draw} onTouchEnd={stopDrawing} />
+                    <button onClick={clearCanvas} className="text-xs text-white/50 hover:text-white"><i className="fas fa-eraser mr-1"></i>Clear</button>
+                </div>
+            );
+        };
+
+        const ExportModal = ({ isOpen, onClose, onExport, pageCount, isExporting }) => {
+            const [activeTab, setActiveTab] = useState('basic');
+            const [filename, setFilename] = useState('document');
+            const [pageSize, setPageSize] = useState('a4');
+            const [addPageNumbers, setAddPageNumbers] = useState(false);
+            const [compress, setCompress] = useState(false);
+            const [compressionQuality, setCompressionQuality] = useState('medium');
+            const [addWatermark, setAddWatermark] = useState(false);
+            const [watermarkText, setWatermarkText] = useState('');
+            const [watermarkPosition, setWatermarkPosition] = useState('diagonal');
+            const [watermarkOpacity, setWatermarkOpacity] = useState(30);
+            const [addPassword, setAddPassword] = useState(false);
+            const [password, setPassword] = useState('');
+            const [showPassword, setShowPassword] = useState(false);
+            const [addSignature, setAddSignature] = useState(false);
+            const [signatureData, setSignatureData] = useState(null);
+            const [applyOcr, setApplyOcr] = useState(false);
+            const [addBgColor, setAddBgColor] = useState(false);
+            const [bgColor, setBgColor] = useState('#FFF5E6');
+
+            if (!isOpen) return null;
+
+            const handleExport = () => {
+                onExport({
+                    filename, pageSize, addPageNumbers, compress, compressionQuality,
+                    watermark: addWatermark && watermarkText ? { text: watermarkText, position: watermarkPosition, opacity: watermarkOpacity / 100 } : null,
+                    password: addPassword && password ? password : null,
+                    signature: addSignature && signatureData ? { data: signatureData, page: -1, x: 350, y: 100, width: 150, height: 50 } : null,
+                    applyOcr,
+                    backgroundColor: addBgColor ? { color: bgColor, opacity: 1.0 } : null,
+                });
+            };
+
+            const tabs = [
+                { id: 'basic', icon: 'sliders-h', label: 'Basic' },
+                { id: 'security', icon: 'shield-alt', label: 'Security' },
+                { id: 'style', icon: 'palette', label: 'Style' },
+                { id: 'sign', icon: 'signature', label: 'Sign' },
+            ];
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm fade-in">
+                    <div className="bg-dark-800 rounded-2xl border border-white/10 shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col fade-in">
+                        <div className="p-5 border-b border-white/10">
+                            <div className="flex items-center justify-between"><h2 className="text-xl font-bold text-white flex items-center gap-2"><i className="fas fa-download text-rose-400"></i>Export PDF</h2><button onClick={onClose} className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/50 hover:text-white"><i className="fas fa-times"></i></button></div>
+                            <p className="text-white/50 text-sm mt-1">{pageCount} page{pageCount !== 1 ? 's' : ''}</p>
+                        </div>
+                        <div className="flex border-b border-white/10 overflow-x-auto">
+                            {tabs.map(t => (<button key={t.id} onClick={() => setActiveTab(t.id)} className={`flex-1 py-3 text-xs font-medium whitespace-nowrap px-2 ${activeTab === t.id ? 'text-rose-400 border-b-2 border-rose-400' : 'text-white/50 hover:text-white'}`}><i className={`fas fa-${t.icon} mr-1`}></i>{t.label}</button>))}
+                        </div>
+                        <div className="p-5 space-y-4 overflow-y-auto modal-scroll flex-1">
+                            {activeTab === 'basic' && (<>
+                                <div><label className="block text-sm font-medium text-white/70 mb-2">Filename</label><div className="flex"><input type="text" value={filename} onChange={(e) => setFilename(e.target.value)} className="flex-1 px-4 py-2.5 bg-white/5 border border-white/10 rounded-l-lg text-white focus:outline-none focus:border-rose-500/50" /><span className="px-4 py-2.5 bg-white/10 border border-l-0 border-white/10 rounded-r-lg text-white/50">.pdf</span></div></div>
+                                <div><label className="block text-sm font-medium text-white/70 mb-2">Page Size</label><div className="grid grid-cols-3 gap-2">{['a4', 'letter', 'legal'].map(s => (<button key={s} onClick={() => setPageSize(s)} className={`px-4 py-2.5 rounded-lg border text-sm font-medium ${pageSize === s ? 'bg-rose-500/20 border-rose-500/50 text-rose-400' : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10'}`}>{s.toUpperCase()}</button>))}</div></div>
+                                <Toggle enabled={addPageNumbers} onChange={setAddPageNumbers} label="Page Numbers" icon="list-ol" />
+                                <Toggle enabled={compress} onChange={setCompress} label="Compress PDF" icon="compress-alt" color="cyan" />
+                                {compress && <div className="ml-8 grid grid-cols-3 gap-2 fade-in">{[{ v: 'low', l: 'Low' }, { v: 'medium', l: 'Med' }, { v: 'high', l: 'High' }].map(q => (<button key={q.v} onClick={() => setCompressionQuality(q.v)} className={`p-2 rounded-lg border text-xs ${compressionQuality === q.v ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-400' : 'bg-white/5 border-white/10 text-white/70'}`}>{q.l}</button>))}</div>}
+                            </>)}
+                            {activeTab === 'security' && (<>
+                                <Toggle enabled={addPassword} onChange={setAddPassword} label="Password Protection" icon="lock" color="amber" />
+                                {addPassword && <div className="ml-8 fade-in"><div className="relative"><input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-2.5 pr-12 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-amber-500/50" placeholder="Password..." /><button onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50"><i className={`fas fa-${showPassword ? 'eye-slash' : 'eye'}`}></i></button></div><p className="text-white/40 text-xs mt-2"><i className="fas fa-info-circle mr-1"></i>AES-256 encryption</p></div>}
+                                <Toggle enabled={applyOcr} onChange={setApplyOcr} label="Make Searchable (OCR)" icon="search" color="teal" />
+                                {applyOcr && <p className="ml-8 text-white/40 text-xs fade-in"><i className="fas fa-info-circle mr-1"></i>Adds invisible text layer for search</p>}
+                            </>)}
+                            {activeTab === 'style' && (<>
+                                <Toggle enabled={addWatermark} onChange={setAddWatermark} label="Watermark" icon="copyright" color="purple" />
+                                {addWatermark && <div className="ml-8 space-y-3 fade-in"><input type="text" value={watermarkText} onChange={(e) => setWatermarkText(e.target.value)} className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none" placeholder="CONFIDENTIAL..." /><div className="grid grid-cols-4 gap-1">{[{ v: 'diagonal', l: '↗' }, { v: 'center', l: '⊙' }, { v: 'top', l: '↑' }, { v: 'bottom', l: '↓' }].map(p => (<button key={p.v} onClick={() => setWatermarkPosition(p.v)} className={`p-2 rounded border text-sm ${watermarkPosition === p.v ? 'bg-purple-500/20 border-purple-500/50' : 'bg-white/5 border-white/10'}`}>{p.l}</button>))}</div><div><label className="text-xs text-white/50">Opacity: {watermarkOpacity}%</label><input type="range" min="10" max="80" value={watermarkOpacity} onChange={(e) => setWatermarkOpacity(Number(e.target.value))} className="w-full accent-purple-500" /></div></div>}
+                                <Toggle enabled={addBgColor} onChange={setAddBgColor} label="Background Color" icon="fill-drip" color="pink" />
+                                {addBgColor && <div className="ml-8 fade-in"><div className="flex gap-2"><input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-12 h-10 rounded cursor-pointer border-0" /><input type="text" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" /></div><div className="flex gap-2 mt-2">{['#FFFFFF', '#FFF5E6', '#F0F8FF', '#F5F5DC', '#E6FFE6'].map(c => (<button key={c} onClick={() => setBgColor(c)} className="w-8 h-8 rounded-lg border-2" style={{ backgroundColor: c, borderColor: bgColor === c ? '#f43f5e' : 'transparent' }}></button>))}</div></div>}
+                            </>)}
+                            {activeTab === 'sign' && (<>
+                                <Toggle enabled={addSignature} onChange={setAddSignature} label="Add Signature" icon="signature" color="indigo" />
+                                {addSignature && <div className="ml-8 fade-in"><label className="block text-sm text-white/70 mb-2">Draw your signature</label><SignatureCanvas onSignatureChange={setSignatureData} /><p className="text-white/40 text-xs mt-2"><i className="fas fa-info-circle mr-1"></i>Appears on last page</p></div>}
+                            </>)}
+                        </div>
+                        <div className="p-5 border-t border-white/10 flex gap-3">
+                            <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 font-medium">Cancel</button>
+                            <button onClick={handleExport} disabled={isExporting} className="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-bold shadow-lg disabled:opacity-50">{isExporting ? <><i className="fas fa-spinner spinner mr-2"></i>...</> : <><i className="fas fa-download mr-2"></i>Export</>}</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ActionBar = ({ pageCount, onClearAll, onOpenExport }) => {
+            if (pageCount === 0) return null;
+            return (
+                <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-dark-900 via-dark-900/95 to-transparent pointer-events-none">
+                    <div className="max-w-4xl mx-auto pointer-events-auto">
+                        <div className="flex items-center justify-between gap-4 p-4 bg-dark-700/90 backdrop-blur-lg rounded-2xl border border-white/10 shadow-2xl">
+                            <button onClick={onClearAll} className="flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-red-500/20 text-white/70 hover:text-red-400 rounded-xl border border-white/10"><i className="fas fa-trash-alt text-sm"></i><span className="hidden sm:inline">Clear</span></button>
+                            <div className="flex items-center gap-2 text-white/60"><i className="fas fa-file-alt text-rose-400"></i><span className="font-medium">{pageCount}</span></div>
+                            <button onClick={onOpenExport} className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-rose-500 to-rose-600 text-white font-bold rounded-xl shadow-lg pulse-glow"><i className="fas fa-download text-sm"></i><span>Export</span></button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const PDFEditorApp = () => {
+            const [pages, setPages] = useState([]);
+            const [isProcessing, setIsProcessing] = useState(false);
+            const [isExporting, setIsExporting] = useState(false);
+            const [showExportModal, setShowExportModal] = useState(false);
+            const [draggedIndex, setDraggedIndex] = useState(null);
+            const [notification, setNotification] = useState(null);
+
+            const showNotification = (msg, type = 'success') => { setNotification({ message: msg, type }); setTimeout(() => setNotification(null), 3000); };
+
+            const handleFilesSelected = async (files) => {
+                if (!files.length) return;
+                setIsProcessing(true);
+                const formData = new FormData();
+                files.forEach(f => formData.append('files', f));
+                try {
+                    const res = await fetch('/api/pdf/upload', { method: 'POST', body: formData });
+                    if (!res.ok) throw new Error();
+                    const data = await res.json();
+                    setPages(prev => [...prev, ...data.pages.map((p, i) => ({ id: `${Date.now()}-${i}-${Math.random().toString(36).substr(2, 9)}`, ...p, serverPath: p.path, rotation: 0 }))]);
+                    showNotification(`Added ${data.pages.length} page(s)`);
+                } catch { showNotification('Upload failed', 'error'); } finally { setIsProcessing(false); }
+            };
+
+            const handleDelete = async (id) => { const p = pages.find(x => x.id === id); try { await fetch('/api/pdf/delete-page', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: p.serverPath }) }); } catch { } setPages(prev => prev.filter(x => x.id !== id)); };
+            const handleRotate = (id) => { setPages(prev => prev.map(p => p.id === id ? { ...p, rotation: (p.rotation + 90) % 360 } : p)); };
+            const handleDuplicate = (id) => { const p = pages.find(x => x.id === id); if (p) { const idx = pages.findIndex(x => x.id === id); setPages(prev => [...prev.slice(0, idx + 1), { ...p, id: `${Date.now()}-dup-${Math.random().toString(36).substr(2, 9)}` }, ...prev.slice(idx + 1)]); showNotification('Duplicated'); } };
+            const handleDragStart = (e, i) => { setDraggedIndex(i); e.dataTransfer.effectAllowed = 'move'; };
+            const handleDragOver = (e) => { e.preventDefault(); };
+            const handleDrop = (e, i) => { e.preventDefault(); if (draggedIndex === null || draggedIndex === i) return setDraggedIndex(null); const arr = [...pages]; const [item] = arr.splice(draggedIndex, 1); arr.splice(i, 0, item); setPages(arr); setDraggedIndex(null); };
+
+            const handleExport = async (opts) => {
+                if (!pages.length) return;
+                setIsExporting(true);
+                try {
+                    const res = await fetch('/api/pdf/export', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pages: pages.map(p => ({ path: p.serverPath, type: p.type, rotation: p.rotation })), ...opts }),
+                    });
+                    if (!res.ok) throw new Error();
+                    const blob = await res.blob();
+                    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${opts.filename}.pdf`; a.click(); URL.revokeObjectURL(a.href);
+                    setShowExportModal(false); showNotification('Exported!');
+                } catch { showNotification('Export failed', 'error'); } finally { setIsExporting(false); }
+            };
+
+            const handleClearAll = async () => { try { await fetch('/api/pdf/clear', { method: 'POST' }); } catch { } setPages([]); };
+
+            return (
+                <>
+                    <Header />
+                    {notification && <div className={`fixed top-20 right-4 z-50 px-5 py-3 rounded-xl shadow-2xl fade-in ${notification.type === 'error' ? 'bg-red-500' : 'bg-emerald-500'} text-white`}><i className={`fas fa-${notification.type === 'error' ? 'exclamation' : 'check'}-circle mr-2`}></i>{notification.message}</div>}
+                    <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-6 pb-32">
+                        <UploadZone onFilesSelected={handleFilesSelected} isProcessing={isProcessing} hasPages={pages.length > 0} />
+                        {pages.length > 0 && <div className="mt-6"><p className="text-white/50 text-sm mb-3"><i className="fas fa-hand-pointer mr-2"></i>Drag to reorder</p><div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">{pages.map((p, i) => <PageCard key={p.id} page={p} index={i} onDelete={handleDelete} onRotate={handleRotate} onDuplicate={handleDuplicate} onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleDrop} isDragging={draggedIndex === i} />)}</div></div>}
+                        {!pages.length && !isProcessing && <div className="text-center py-12"><div className="w-20 h-20 mx-auto mb-4 rounded-full bg-rose-500/10 flex items-center justify-center"><i className="fas fa-file-pdf text-3xl text-rose-400/30"></i></div><h3 className="text-lg font-bold text-white/40 mb-1">No pages yet</h3><p className="text-white/30 text-sm">Upload files to get started</p><div className="flex flex-wrap justify-center gap-2 mt-6 text-xs">{[{ i: 'redo', c: 'blue', l: 'Rotate' }, { i: 'copy', c: 'green', l: 'Duplicate' }, { i: 'compress-alt', c: 'cyan', l: 'Compress' }, { i: 'lock', c: 'amber', l: 'Password' }, { i: 'copyright', c: 'purple', l: 'Watermark' }, { i: 'signature', c: 'indigo', l: 'Sign' }, { i: 'search', c: 'teal', l: 'OCR' }, { i: 'fill-drip', c: 'pink', l: 'Background' }].map(f => <div key={f.l} className={`flex items-center gap-1 px-3 py-1.5 bg-white/5 rounded-full text-white/40`}><i className={`fas fa-${f.i} text-${f.c}-400/50`}></i><span>{f.l}</span></div>)}</div></div>}
+                    </main>
+                    <ActionBar pageCount={pages.length} onClearAll={handleClearAll} onOpenExport={() => setShowExportModal(true)} />
+                    <ExportModal isOpen={showExportModal} onClose={() => setShowExportModal(false)} onExport={handleExport} pageCount={pages.length} isExporting={isExporting} />
+                </>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('pdf-editor-root')).render(<PDFEditorApp />);
+    </script>
+    {% endraw %}
+</body>
+
+</html>
