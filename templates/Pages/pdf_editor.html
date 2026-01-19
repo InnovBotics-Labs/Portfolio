@@ -121,7 +121,7 @@
 
 <body class="text-white/90 font-sans antialiased">
     <script>
-        window.logoUrl = "{{ url_for('static', filename='assets/pdf_editor_icon-removebg-preview.png') }}";
+        window.logoUrl = "{{ url_for('static', filename='assets/pdf_editor_icon.png') }}";
     </script>
     {% raw %}
     <div id="pdf-editor-root" class="min-h-screen flex flex-col"></div>
@@ -133,7 +133,7 @@
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-red-600 shadow-lg border border-white/10 flex items-center justify-center"><img src={window.logoUrl} className="w-6 h-6 object-contain filter drop-shadow" alt="Logo" /></div>
+                            <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-white/10"><img src={window.logoUrl} className="w-full h-full object-cover" alt="Logo" /></div>
                             <div><h1 className="font-display font-bold text-lg text-white">PDF Editor Pro</h1><p className="text-xs text-white/50 hidden sm:block">Edit, Sign, Annotate, Export</p></div>
                         </div>
                         <a href="/" className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-all"><i className="fas fa-arrow-left text-sm"></i><span className="hidden sm:inline">Back</span></a>

@@ -1,29 +1,55 @@
-gunicorn~=23.0.0
-psycopg2-binary~=2.9.10
-WTForms~=3.2.1
-flask_wtf
-MarkupSafe~=3.0.2
-Flask-Bootstrap~=3.3.7.1
-Flask~=3.1.0
-Bootstrap_Flask==2.4.1
-WTForms==3.2.1
-Flask_WTF==1.2.2
-Werkzeug==3.1.4
-future~=1.0.0
-Flask-Cors~=5.0.0
-flask_sqlalchemy==3.1.1
-SQLAlchemy==2.0.25
-Flask_Login==0.6.3
+# =============================================================================
+# Portfolio Website Dependencies
+# =============================================================================
+# Updated: 2026-01-19
+# =============================================================================
 
+# -----------------------------------------------------------------------------
+# Core Flask Dependencies
+# -----------------------------------------------------------------------------
+Flask~=3.1.0
+Werkzeug==3.1.4
+gunicorn~=23.0.0
+
+# -----------------------------------------------------------------------------
+# Form Handling & Validation
+# -----------------------------------------------------------------------------
+WTForms~=3.2.1
+Flask-WTF==1.2.2
 email-validator~=2.2.0
-dotenv~=0.9.9
+
+# -----------------------------------------------------------------------------
+# Environment & Configuration
+# -----------------------------------------------------------------------------
 python-dotenv~=1.0.1
-# PDF Editor dependencies
+
+# -----------------------------------------------------------------------------
+# Utilities
+# -----------------------------------------------------------------------------
+MarkupSafe~=3.0.2
+Flask-Cors~=5.0.0
+
+# -----------------------------------------------------------------------------
+# PDF Editor Dependencies
+# -----------------------------------------------------------------------------
 pypdf~=4.0.0
 Pillow~=10.2.0
 reportlab~=4.1.0
 PyMuPDF~=1.24.0
 pytesseract~=0.3.10
-# Data Converter dependencies
+
+# -----------------------------------------------------------------------------
+# Data Converter Dependencies
+# -----------------------------------------------------------------------------
 PyYAML~=6.0.1
 xmltodict
+
+# -----------------------------------------------------------------------------
+# Deprecated (Removed)
+# -----------------------------------------------------------------------------
+# flask_sqlalchemy - Database replaced with email notifications
+# SQLAlchemy - No longer needed
+# Flask_Login - Authentication not currently implemented
+# psycopg2-binary - PostgreSQL driver not needed
+# Flask-Bootstrap - Using custom Tailwind CSS styling
+# Bootstrap_Flask - Using custom Tailwind CSS styling
