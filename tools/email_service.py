@@ -382,9 +382,15 @@ class EmailService:
             bool: True if sent successfully
         """
         try:
-            # Add timeout to SMTP connection (10 seconds)
-            with smtplib.SMTP(self._config.server, self._config.port, timeout=10) as server:
-                if self._config.use_tls:
+            # Check if we should use SSL (Port 465) or StartTLS (Port 587)
+            if self._config.port == 465:
+                context = smtplib.SMTP_SSL(self._config.server, self._config.port, timeout=10)
+            else:
+                context = smtplib.SMTP(self._config.server, self._config.port, timeout=10)
+
+            with context as server:
+                # For non-SSL connections (like 587), start TLS explicitly
+                if self._config.port != 465 and self._config.use_tls:
                     server.starttls()
                 
                 server.login(self._config.username, self._config.password)
@@ -401,6 +407,9 @@ class EmailService:
             return False
         except socket.timeout:
             logger.error("SMTP connection timed out")
+            return False
+        except OSError as e:
+            logger.error(f"Network error (blocked port?): {e}")
             return False
         except Exception as e:
             logger.exception(f"Unexpected error sending email: {e}")
