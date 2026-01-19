@@ -12,6 +12,8 @@ Created: 2026-01-19
 # Dependencies
 import smtplib
 import logging
+import threading
+import socket
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dataclasses import dataclass, field
@@ -327,20 +329,20 @@ class EmailService:
     
     def send_contact_notification(self, contact: ContactFormData) -> bool:
         """
-        Send a contact form notification email.
+        Send a contact form notification email asynchronously.
         
         Args:
             contact: ContactFormData with form submission details
             
         Returns:
-            bool: True if email sent successfully, False otherwise
+            bool: True (always returns True to not block user, errors logged)
         """
         if not self._config.is_valid():
             logger.error("Invalid email configuration - missing required fields")
             return False
         
+        # Build message in main thread to catch validation errors early
         try:
-            # Build the email message
             message = (
                 EmailMessageBuilder()
                 .set_subject(self._template.generate_subject(contact))
@@ -348,20 +350,30 @@ class EmailService:
                 .set_body_html(self._template.generate_html(contact))
                 .set_from(self._config.sender_email, self._config.sender_name)
                 .set_to(self._config.recipient_email)
-                .set_reply_to(contact.email)  # Allow direct reply to sender
+                .set_reply_to(contact.email)
                 .build()
             )
-            
-            # Send via SMTP
-            return self._send_smtp(message)
-            
         except Exception as e:
-            logger.exception(f"Failed to build or send email: {e}")
+            logger.exception(f"Failed to build email: {e}")
             return False
+
+        # Send in a background thread
+        thread = threading.Thread(target=self._send_smtp_thread, args=(message,))
+        thread.daemon = True
+        thread.start()
+        
+        return True
     
+    def _send_smtp_thread(self, message: MIMEMultipart) -> None:
+        """Background thread execution for SMTP sending."""
+        try:
+            self._send_smtp(message)
+        except Exception as e:
+            logger.exception(f"Background email send failed: {e}")
+
     def _send_smtp(self, message: MIMEMultipart) -> bool:
         """
-        Send email via SMTP connection.
+        Send email via SMTP connection with timeout.
         
         Args:
             message: Constructed email message
@@ -370,15 +382,12 @@ class EmailService:
             bool: True if sent successfully
         """
         try:
-            with smtplib.SMTP(self._config.server, self._config.port) as server:
-                # Start TLS if configured
+            # Add timeout to SMTP connection (10 seconds)
+            with smtplib.SMTP(self._config.server, self._config.port, timeout=10) as server:
                 if self._config.use_tls:
                     server.starttls()
                 
-                # Authenticate
                 server.login(self._config.username, self._config.password)
-                
-                # Send the email
                 server.send_message(message)
                 
                 logger.info(f"Email sent successfully to {self._config.recipient_email}")
@@ -390,8 +399,8 @@ class EmailService:
         except smtplib.SMTPConnectError:
             logger.error(f"Failed to connect to SMTP server: {self._config.server}:{self._config.port}")
             return False
-        except smtplib.SMTPException as e:
-            logger.error(f"SMTP error occurred: {e}")
+        except socket.timeout:
+            logger.error("SMTP connection timed out")
             return False
         except Exception as e:
             logger.exception(f"Unexpected error sending email: {e}")
