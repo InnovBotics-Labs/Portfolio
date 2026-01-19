@@ -1,16 +1,32 @@
 """
-AppName:Server
-purpose: will act as a server for the portfolio website
+Portfolio Server
+================
+Main Flask application serving the portfolio website with integrated tools.
+
+Author: Prabhukumar Sivamoorthy
+Purpose: Acts as a server for the portfolio website
 """
+
+# =============================================================================
 # Dependencies
+# =============================================================================
 import os
-from flask import Flask, render_template, request, send_from_directory, url_for, jsonify, send_file
+import logging
+from flask import (
+    Flask, 
+    render_template, 
+    request, 
+    send_from_directory, 
+    url_for, 
+    jsonify, 
+    flash
+)
 from werkzeug.utils import redirect
-from config import Config  # Import Config class
+from config import Config
 
 # Internal Modules
 from tools.wt_forms import PingMeForm, RegisterForm, LoginForm
-from tools.data_model import read_all_records, create_record, init_db, Inquirer
+from tools.email_service import EmailService, EmailConfig, ContactFormData, create_email_service
 from tools.pdf_editor import (
     process_uploaded_file,
     merge_pages_to_pdf,
@@ -27,25 +43,43 @@ from tools.pdf_editor import (
 )
 from tools.data_converter import convert_data
 
+# =============================================================================
+# Application Configuration
+# =============================================================================
 
-# Global Declarations/Configurations
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Initialize Flask App
 app = Flask(__name__)
-app.config.from_object(Config)  # Load configuration
+app.config.from_object(Config)
 
 # PDF Editor upload folder configuration
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads', 'pdf_editor')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max upload size
 
-# Using Tailwind CSS - no Bootstrap initialization needed
+# Initialize Email Service
+email_service = create_email_service(Config)
+if email_service:
+    logger.info("Email service initialized successfully")
+else:
+    logger.warning("Email service not configured - contact form emails will not be sent")
 
-init_db(app)
 
-# Methods------------------------------
+# =============================================================================
+# Main Routes
+# =============================================================================
+
 @app.route('/')
 def home() -> str:
     """
-    Takes user to Homepage of the Server website
+    Homepage of the Portfolio website.
+    Renders the main index page with the contact form.
     """
     ping_form = PingMeForm()
     return render_template('index.html', form=ping_form)
@@ -53,50 +87,71 @@ def home() -> str:
 
 @app.route("/ping", methods=['GET', 'POST'])
 def ping():
-    """Q & A form"""
+    """
+    Handle contact form (Ping Me) submissions.
+    Validates form data and sends email notification.
+    
+    Returns:
+        Redirect to home with flash message indicating success/failure
+    """
     form = PingMeForm()
+    
     if form.validate_on_submit() and request.method == 'POST':
         data = request.form
-        # Create an instance of the Inquirer model
-        new_inquirer = Inquirer(
-            f_name=data["f_name"],
-            l_name=data["l_name"],
-            email=data["email"],
-            country_code=data["country_code"],
-            phone=data["phone"],  # Ensure phone is stored as an integer
-            message=data["message"]
+        
+        # Create contact data object
+        contact = ContactFormData(
+            first_name=data.get("f_name", ""),
+            last_name=data.get("l_name", ""),
+            email=data.get("email", ""),
+            country_code=data.get("country_code", ""),
+            phone=data.get("phone", ""),
+            message=data.get("message", "")
         )
-        create_record(new_inquirer)
-        return redirect(url_for('inquirer'))
+        
+        # Send email notification
+        if email_service:
+            success = email_service.send_contact_notification(contact)
+            if success:
+                flash("Thank you! Your message has been sent successfully.", "success")
+                logger.info(f"Contact form submitted by {contact.email}")
+            else:
+                flash("Sorry, there was an issue sending your message. Please try again later.", "error")
+                logger.error(f"Failed to send contact form email for {contact.email}")
+        else:
+            # Email service not configured - log the submission
+            logger.warning(f"Email service not configured. Contact from: {contact.email}")
+            flash("Thank you for your message! We'll get back to you soon.", "info")
+        
+        return redirect(url_for('home') + '#contact')
+    
     return redirect(url_for('home'))
 
-@app.route('/inquirer')
-def inquirer():
-    """Downloads the resumes"""
-    inquirers = read_all_records(Inquirer)
-    return render_template('Pages/inquirer.html', inquirers=inquirers)
 
 @app.route('/download')
 def download():
-    """Downloads the resumes"""
+    """Downloads the resume file."""
     return send_from_directory('static', path="assets/files/under-construction-sign.pdf")
+
 
 @app.route('/portal')
 def portal():
-    """Takes you to portal page"""
+    """Portal page for authenticated users."""
     return render_template('Pages/portal.html')
+
 
 @app.route('/login')
 def login():
-    """Takes you to login page"""
+    """Login page."""
     login_form = LoginForm()
-    return render_template('Pages/login.html',form = login_form)
+    return render_template('Pages/login.html', form=login_form)
+
 
 @app.route('/register')
 def register():
-    """ Takes you to registration """
+    """Registration page."""
     register_form = RegisterForm()
-    return render_template('Pages/login.html', form = register_form)
+    return render_template('Pages/login.html', form=register_form)
 
 
 # =============================================================================
@@ -105,16 +160,18 @@ def register():
 
 @app.route('/pdf-editor')
 def pdf_editor():
-    """PDF Editor page"""
+    """PDF Editor page."""
     return render_template('Pages/pdf_editor.html')
 
 
 @app.route('/api/pdf/upload', methods=['POST'])
 def pdf_upload():
     """
-    API endpoint to upload files for PDF editor
-    Accepts images and PDF files
-    Returns page metadata with thumbnails
+    API endpoint to upload files for PDF editor.
+    Accepts images and PDF files.
+    
+    Returns:
+        JSON: Page metadata with thumbnails
     """
     if 'files' not in request.files:
         return jsonify({'error': 'No files provided'}), 400
@@ -132,7 +189,8 @@ def pdf_upload():
 @app.route('/api/pdf/export', methods=['POST'])
 def pdf_export():
     """
-    API endpoint to export merged PDF with all processing options
+    API endpoint to export merged PDF with all processing options.
+    Supports watermarks, compression, password protection, annotations, etc.
     """
     data = request.get_json()
     
@@ -247,7 +305,7 @@ def pdf_export():
         return response
         
     except Exception as e:
-        print(f"Error sending PDF: {e}")
+        logger.error(f"Error sending PDF: {e}")
         if os.path.exists(output_path):
             os.remove(output_path)
         return jsonify({'error': 'Failed to send PDF'}), 500
@@ -256,7 +314,8 @@ def pdf_export():
 @app.route('/api/pdf/delete-page', methods=['POST'])
 def pdf_delete_page():
     """
-    API endpoint to delete a specific page file
+    API endpoint to delete a specific page file.
+    Ensures path security by validating against upload folder.
     """
     data = request.get_json()
     
@@ -279,12 +338,9 @@ def pdf_delete_page():
 
 @app.route('/api/pdf/clear', methods=['POST'])
 def pdf_clear():
-    """
-    API endpoint to clear all uploaded files
-    """
+    """API endpoint to clear all uploaded files."""
     count = cleanup_upload_folder(app.config['UPLOAD_FOLDER'])
     return jsonify({'success': True, 'deleted': count})
-
 
 
 # =============================================================================
@@ -293,14 +349,17 @@ def pdf_clear():
 
 @app.route('/data-converter')
 def data_converter():
-    """Data Converter page"""
+    """Data Converter page."""
     return render_template('Pages/data_converter.html')
+
 
 @app.route('/api/convert-data', methods=['POST'])
 def api_convert_data():
     """
-    API endpoint for data conversion
+    API endpoint for data conversion.
+    
     Expects JSON: { content: str, inputFormat: str, outputFormat: str }
+    Returns: JSON with converted data or error message
     """
     data = request.get_json()
     if not data:
@@ -314,7 +373,9 @@ def api_convert_data():
     return jsonify(result)
 
 
-# ------------------------------------------
+# =============================================================================
+# Entry Point
+# =============================================================================
+
 if __name__ == "__main__":
     app.run(debug=app.config["DEBUG"])
-
