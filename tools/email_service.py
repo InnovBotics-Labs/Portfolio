@@ -358,23 +358,15 @@ class EmailService:
             return False
 
         # Send in a background thread
-        thread = threading.Thread(target=self._send_email_thread, args=(contact, message))
+        thread = threading.Thread(target=self._send_smtp_thread, args=(message,))
         thread.daemon = True
         thread.start()
         
         return True
     
-    def _send_email_thread(self, contact: ContactFormData, message: MIMEMultipart) -> None:
-        """Background thread to choose method and send email."""
-        import os
+    def _send_smtp_thread(self, message: MIMEMultipart) -> None:
+        """Background thread execution for SMTP sending."""
         try:
-            # Prioritize Resend API if configured (bypasses port blocks)
-            if os.environ.get('RESEND_API_KEY'):
-                success = self._send_resend(contact)
-                if success:
-                    return
-
-            # Fallback to SMTP
             self._send_smtp(message)
         except Exception as e:
             logger.exception(f"Background email send failed: {e}")
@@ -421,54 +413,6 @@ class EmailService:
             return False
         except Exception as e:
             logger.exception(f"Unexpected error sending email: {e}")
-            return False
-
-    def _send_resend(self, contact: ContactFormData) -> bool:
-        """
-        Send email via Resend API (HTTP) to bypass SMTP blocks.
-        Requires RESEND_API_KEY in env vars.
-        """
-        import os
-        import requests
-        
-        api_key = os.environ.get('RESEND_API_KEY')
-        if not api_key:
-            logger.error("Missing RESEND_API_KEY for API-based sending")
-            return False
-            
-        try:
-            subject = self._template.generate_subject(contact)
-            html_content = self._template.generate_html(contact)
-            
-            payload = {
-                "from": f"{self._config.sender_name} <onboarding@resend.dev>",
-                "to": [self._config.recipient_email],
-                "subject": subject,
-                "html": html_content,
-                "reply_to": contact.email
-            }
-            
-            headers = {
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json"
-            }
-            
-            response = requests.post(
-                "https://api.resend.com/emails",
-                json=payload,
-                headers=headers,
-                timeout=10
-            )
-            
-            if response.status_code in [200, 201]:
-                logger.info(f"Email sent via Resend API to {self._config.recipient_email}")
-                return True
-            else:
-                logger.error(f"Resend API failed: {response.text}")
-                return False
-                
-        except Exception as e:
-            logger.exception(f"Resend API error: {e}")
             return False
     
     def test_connection(self) -> bool:
