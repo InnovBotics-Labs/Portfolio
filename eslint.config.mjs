@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     // Vendored prototype scripts, ported verbatim from Claude Design.
     "public/bg3d.js",
     "public/image-slot.js",
+    // Vendored PDF runtime assets (pdf.js worker, qpdf-wasm glue).
+    "public/pdf-editor/**",
   ]),
   {
     // The PDF editor is a faithful port of a Claude Design prototype (one

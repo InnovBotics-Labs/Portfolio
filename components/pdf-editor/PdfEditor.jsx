@@ -8,8 +8,38 @@
  */
 import React from "react";
 import { createPortal } from "react-dom";
+import * as engine from "./lib/engine";
+import * as store from "./lib/storage";
 const { useState, useRef, useEffect, useCallback, useMemo } = React;
 const ReactDOM = { createPortal };
+
+/* Renders a real PDF page into a canvas via pdf.js and stretches it to fill its
+   point-sized sheet. `quality` supersamples for zoom crispness (decoupled from
+   the live zoom, which is applied by the sheet's CSS transform). */
+function PdfCanvas({ docId, index, quality = 2, fill = true }) {
+  const ref = useRef(null);
+  const [seen, setSeen] = useState(false);
+  // Only render once the canvas nears the viewport — keeps large docs smooth.
+  useEffect(() => {
+    const c = ref.current;
+    if (!c) return;
+    const io = new IntersectionObserver(
+      (entries) => { if (entries.some((e) => e.isIntersecting)) setSeen(true); },
+      { rootMargin: "500px" },
+    );
+    io.observe(c);
+    return () => io.disconnect();
+  }, []);
+  useEffect(() => {
+    const c = ref.current;
+    if (!c || docId == null || !seen) return;
+    engine.renderPage(docId, index, quality, c).catch(() => {});
+  }, [docId, index, quality, seen]);
+  const style = fill
+    ? { position: "absolute", inset: 0, width: "100%", height: "100%" }
+    : { width: "100%", height: "100%", display: "block" };
+  return <canvas ref={ref} style={style} />;
+}
 
 /* ════════════════════ icons.jsx ════════════════════ */
 // icons.jsx — consistent 24px line icons, 1.6 stroke, currentColor.
@@ -1205,7 +1235,7 @@ function PageInner({ page, annotations, interactive, tool, toolProps, selectedId
 
   return (
     <>
-      <SamplePageContent type={page.type} />
+      <PdfCanvas docId={page.docId} index={page.srcIndex} />
       <div ref={layerRef} className={'anno-layer ' + cursorCls}
            onPointerDown={onLayerDown} onPointerMove={onLayerMove} onPointerUp={onLayerUp}>
         {annotations.map((a) => (
@@ -1343,10 +1373,10 @@ function Canvas(props) {
         {pages.map((page, i) => (
           <div key={page.id} className={'sheet-wrap' + (i === currentIndex ? ' current' : '') + (splitSel.includes(page.id) ? ' split-sel' : '')}
                ref={(el) => (sheetRefs.current[i] = el)}
-               style={{ width: PAGE_W * zoom, height: PAGE_H * zoom }}
+               style={{ width: (page.w || PAGE_W) * zoom, height: (page.h || PAGE_H) * zoom }}
                onClick={() => { if (tool === 'split') props.onToggleSplit(page.id); }}>
-            <div className="sheet" style={{ width: PAGE_W, height: PAGE_H, transform: `scale(${zoom}) rotate(${page.rotation || 0}deg)`,
-                 transformOrigin: 'top left', ...(page.rotation ? { transformOrigin: 'center center', position: 'absolute', top: (PAGE_H * zoom - PAGE_H) / 2, left: (PAGE_W * zoom - PAGE_W) / 2 } : {}) }}>
+            <div className="sheet" style={{ width: (page.w || PAGE_W), height: (page.h || PAGE_H), transform: `scale(${zoom}) rotate(${page.rotation || 0}deg)`,
+                 transformOrigin: 'top left', ...(page.rotation ? { transformOrigin: 'center center', position: 'absolute', top: ((page.h || PAGE_H) * zoom - (page.h || PAGE_H)) / 2, left: ((page.w || PAGE_W) * zoom - (page.w || PAGE_W)) / 2 } : {}) }}>
               <PageInner page={page} annotations={props.annotations[page.id] || []} interactive={tool !== 'split'}
                 tool={tool} toolProps={props.toolProps} selectedId={props.selectedId} zoom={zoom}
                 onAddAnno={(an) => props.onAddAnno(page.id, an)} onUpdateAnno={props.onUpdateAnno}
@@ -1368,17 +1398,18 @@ function Canvas(props) {
 // ── Thumbnail (measures width, scales page content) ──
 function Thumb({ page, annotations }) {
   const ref = React.useRef(null);
+  const pw = page.w || PAGE_W, ph = page.h || PAGE_H;
   const [scale, setScale] = React.useState(0.12);
   React.useEffect(() => {
     const el = ref.current; if (!el) return;
-    const set = () => setScale(el.clientWidth / PAGE_W);
+    const set = () => setScale(el.clientWidth / pw);
     set();
     const ro = new ResizeObserver(set); ro.observe(el); return () => ro.disconnect();
-  }, []);
+  }, [pw]);
   return (
     <div ref={ref} className="thumb-fill" style={{ position: 'absolute', inset: 0 }}>
-      <div className="thumb-render" style={{ width: PAGE_W, height: PAGE_H, transform: `scale(${scale}) rotate(${page.rotation || 0}deg)`, transformOrigin: page.rotation ? 'center center' : 'top left' }}>
-        <SamplePageContent type={page.type} />
+      <div className="thumb-render" style={{ width: pw, height: ph, transform: `scale(${scale}) rotate(${page.rotation || 0}deg)`, transformOrigin: page.rotation ? 'center center' : 'top left' }}>
+        <PdfCanvas docId={page.docId} index={page.srcIndex} quality={0.5} />
         <div className="anno-layer" style={{ pointerEvents: 'none' }}>
           {(annotations || []).map((a) => <AnnoView key={a.id} a={a} interactive={false} zoom={1} />)}
         </div>
@@ -1435,7 +1466,7 @@ function ThumbStrip(props) {
         <button className="iconbtn lt-collapse" onClick={props.onCollapse} aria-label="Hide panel"><Icon name="chevronLeft" size={16} /></button>
       </div>
       {tab === 'contents' ? (
-        <TOCTree pages={pages} currentIndex={currentIndex} onNav={onTocNav} generated />
+        <TOCTree toc={props.toc} currentIndex={currentIndex} onNav={onTocNav} generated={props.tocGenerated} />
       ) : (
       <div className="thumbs-scroll">
         {pages.map((page, i) => (
@@ -1638,8 +1669,7 @@ function buildTOC(pages) {
 }
 
 // ── TOC tree ──
-function TOCTree({ pages, currentIndex, onNav, generated }) {
-  const toc = buildTOC(pages);
+function TOCTree({ toc = [], currentIndex, onNav, generated }) {
   const [collapsed, setCollapsed] = React.useState({});
   const toggle = (k) => setCollapsed((c) => ({ ...c, [k]: !c[k] }));
   return (
@@ -1691,13 +1721,11 @@ Object.assign(window, { collectMatches, FindBar, buildTOC, TOCTree });
 // MiniPage preview. Driven by props from App.
 
 function MiniPage({ page, w = 92 }) {
-  const scale = w / PAGE_W;
+  const pw = page.w || PAGE_W, ph = page.h || PAGE_H;
   return (
-    <div style={{ width: w, height: PAGE_H * scale, background: 'var(--doc-bg)', borderRadius: 4,
+    <div style={{ width: w, height: ph * (w / pw), background: 'var(--doc-bg)', borderRadius: 4,
       overflow: 'hidden', boxShadow: '0 0 0 1px var(--border-strong)', position: 'relative', flexShrink: 0 }}>
-      <div style={{ width: PAGE_W, height: PAGE_H, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
-        <SamplePageContent type={page.type} />
-      </div>
+      <PdfCanvas docId={page.docId} index={page.srcIndex} quality={0.5} fill />
     </div>
   );
 }
@@ -1776,7 +1804,7 @@ function FileRow({ file, badge, isCurrent, onOpen, onDownload, onRename, onDelet
           <div className="file-name" onDoubleClick={() => setEditing(true)} title={file.name}>{file.name}</div>
         )}
         <div className="file-meta">
-          {file.pages.length} page{file.pages.length > 1 ? 's' : ''} · {meta.label}{file.when ? ' · ' + timeAgo(file.when) : ''}
+          {(() => { const n = file.pageCount ?? (file.pages ? file.pages.length : 0); return `${n} page${n === 1 ? '' : 's'}`; })()} · {meta.label}{file.when ? ' · ' + timeAgo(file.when) : ''}
           {isCurrent && ' · open now'}
         </div>
       </div>
@@ -1922,6 +1950,9 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [matchCase, setMatchCase] = useState(false);
   const [matches, setMatches] = useState([]);
+  const [toc, setToc] = useState({ nodes: [], generated: true });
+  const [unlock, setUnlock] = useState(null); // { bytes, name, mode } for an encrypted upload
+  const [unlockPw, setUnlockPw] = useState('');
   const [currentMatch, setCurrentMatch] = useState(-1);
   const findInputRef = useRef(null);
 
@@ -1952,7 +1983,9 @@ function App() {
   const fitToWidth = useCallback(() => {
     const el = document.querySelector('.canvas-scroll');
     if (!el) return;
-    const z = Math.min(1.6, Math.max(0.4, (el.clientWidth - 80) / PAGE_W));
+    const sheet = document.querySelector('.canvas-pages .sheet');
+    const pw = (sheet && sheet.offsetWidth) || PAGE_W;
+    const z = Math.min(1.6, Math.max(0.4, (el.clientWidth - 80) / pw));
     setZoom(Math.round(z * 100) / 100);
   }, []);
 
@@ -1963,31 +1996,110 @@ function App() {
     setTimeout(fitToWidth, 60);
   };
 
-  // ── session files (outputs) ──
-  const addFile = (f) => setOutputFiles((prev) => [{ id: 'f' + Date.now() + Math.random().toString(36).slice(2, 5), when: Date.now(), ...f }, ...prev]);
+  // ── session files (outputs) + IndexedDB persistence ──
+  const persistRecord = async (rec) => {
+    if (!rec.bytes) return;
+    try { await store.saveDoc({ id: rec.id, name: rec.name, kind: rec.kind, bytes: rec.bytes, pageCount: rec.pageCount || 0, when: rec.when, annotations: rec.annotations }); }
+    catch (e) { console.warn('persist failed', e); }
+  };
+  const addFile = (f) => {
+    const rec = { id: f.id || ('f' + Date.now() + Math.random().toString(36).slice(2, 5)), when: Date.now(), ...f };
+    setOutputFiles((prev) => [rec, ...prev.filter((x) => x.id !== rec.id)]);
+    persistRecord(rec);
+  };
+  // hydrate the Files list from IndexedDB on mount (survives reload)
+  useEffect(() => { store.listDocs().then((docs) => { if (docs && docs.length) setOutputFiles(docs); }).catch(() => {}); }, []);
+  const persistDoc = (d) => addFile(d);
+
   const snapshotWorking = () => setOutputFiles((prev) => {
-    if (prev.some((x) => x.kind === 'document' && x.name === docName && x.pages.length === pages.length)) return prev;
-    return [{ id: 'f' + Date.now(), when: Date.now(), kind: 'document', name: docName, pages, annotations }, ...prev];
+    if (prev.some((x) => x.kind === 'document' && x.name === docName && x.pageCount === pages.length)) return prev;
+    return [{ id: 'f' + Date.now(), when: Date.now(), kind: 'document', name: docName, pages: pages.map((p) => ({ ...p })), annotations, pageCount: pages.length }, ...prev];
   });
-  const openFileRecord = (file) => { snapshotWorking(); doLoad(file.pages.map((p) => ({ ...p })), file.name, file.annotations || {}); setFilesOpen(false); toast('Opened', 'success', file.name); };
-  const downloadFile = (file) => toast('PDF downloaded', 'success', file.name);
-  const renameFile = (id, name) => setOutputFiles((prev) => prev.map((f) => f.id === id ? { ...f, name } : f));
-  const deleteFile = (file) => setOutputFiles((prev) => prev.filter((f) => f.id !== file.id));
+  const openFileRecord = async (file) => {
+    snapshotWorking();
+    if (file.bytes) await loadBytes(file.bytes, file.name);
+    else if (file.pages) doLoad(file.pages.map((p) => ({ ...p })), file.name, file.annotations || {});
+    setFilesOpen(false);
+  };
+  const downloadFile = async (file) => {
+    let bytes = file.bytes;
+    if (!bytes && file.pages) bytes = await engine.buildPdf(refsOf(file.pages), file.annotations || {}, idsOf(file.pages)).catch(() => null);
+    if (bytes) { downloadBytes(bytes, file.name); toast('PDF downloaded', 'success', file.name); }
+  };
+  const renameFile = (id, name) => { setOutputFiles((prev) => prev.map((f) => f.id === id ? { ...f, name } : f)); store.renameDoc(id, name).catch(() => {}); };
+  const deleteFile = (file) => { setOutputFiles((prev) => prev.filter((f) => f.id !== file.id)); store.deleteDoc(file.id).catch(() => {}); };
 
   const startConvert = (files, after) => {
     setConverting(files);
     setTimeout(() => { setConverting(null); after(); }, 1500);
   };
 
-  const loadSample = () => {
-    const ps = SAMPLE_DOC.pages.map((p) => ({ ...p, rotation: 0 }));
-    startConvert([{ name: SAMPLE_DOC.name, icon: 'file' }], () => { doLoad(ps, SAMPLE_DOC.name); toast('Document ready', 'success', '5 pages loaded'); });
+  // ── real file loading (pdf.js + pdf-lib via engine) ──
+  const fileInputRef = useRef(null);
+  const pickMode = useRef('open');
+
+  const refsFromSource = (docId, sizes) =>
+    sizes.map((s, i) => ({ id: 'p_' + docId + '_' + i, docId, srcIndex: i, rotation: 0, w: s.w, h: s.h }));
+
+  const loadBytes = async (bytes, name, password) => {
+    const { docId, sizes } = await engine.loadPdf(bytes, password);
+    doLoad(refsFromSource(docId, sizes), name);
+    toast('Document ready', 'success', sizes.length + (sizes.length > 1 ? ' pages loaded' : ' page loaded'));
   };
-  const openFile = () => {
-    if (!loaded) return loadSample();
-    // simulate browse → convert sample again
-    startConvert([{ name: 'Northwind-MSA-2026.pdf', icon: 'file' }], () => { doLoad(SAMPLE_DOC.pages.map((p) => ({ ...p, rotation: 0 })), SAMPLE_DOC.name); toast('Document opened', 'success'); });
+
+  const mergeBytes = async (bytes, name, password) => {
+    const { docId, sizes } = await engine.loadPdf(bytes, password);
+    const startIdx = pages.length;
+    record();
+    setPages((p) => [...p, ...refsFromSource(docId, sizes)]);
+    markSaving(); setLeftTab('pages'); setCurrentIndex(startIdx); setScrollToken((x) => x + 1);
+    toast(sizes.length + ' page' + (sizes.length > 1 ? 's' : '') + ' merged', 'success', 'Jumped to the new pages');
   };
+
+  const processFile = async (file, mode) => {
+    if (!file) return;
+    const isImg = /image\/(png|jpe?g)/i.test(file.type) || /\.(png|jpe?g)$/i.test(file.name);
+    setConverting([{ name: file.name, icon: isImg ? 'image' : 'file' }]);
+    let bytes;
+    const name = file.name.replace(/\.(png|jpe?g)$/i, '.pdf');
+    try {
+      bytes = isImg ? await engine.imageToPdf(file) : new Uint8Array(await file.arrayBuffer());
+      if (mode === 'merge' && loaded) await mergeBytes(bytes, name);
+      else await loadBytes(bytes, name);
+    } catch (e) {
+      if (e instanceof engine.PasswordRequiredError && bytes) { setUnlock({ bytes, name, mode }); }
+      else { console.warn('open failed', e); toast('Could not open that file', 'warn'); }
+    } finally {
+      setConverting(null);
+    }
+  };
+
+  const pickFiles = (mode) => { pickMode.current = mode; if (fileInputRef.current) { fileInputRef.current.value = ''; fileInputRef.current.click(); } };
+
+  const doUnlock = async () => {
+    if (!unlock || !unlockPw) return;
+    const { bytes, name, mode } = unlock;
+    setUnlock(null); setConverting([{ name, icon: 'file' }]);
+    try {
+      if (mode === 'merge' && loaded) await mergeBytes(bytes, name, unlockPw);
+      else await loadBytes(bytes, name, unlockPw);
+      toast('Unlocked', 'success', name);
+    } catch (e) {
+      console.warn(e); toast('Wrong password', 'warn', 'Try again');
+      setUnlock({ bytes, name, mode });
+    } finally { setConverting(null); setUnlockPw(''); }
+  };
+
+  const loadSample = async () => {
+    setConverting([{ name: 'Master Services Agreement.pdf', icon: 'file' }]);
+    try {
+      const res = await fetch('/pdf-editor/sample.pdf');
+      const bytes = new Uint8Array(await res.arrayBuffer());
+      await loadBytes(bytes, 'Master Services Agreement.pdf');
+    } catch (e) { console.warn(e); toast('Could not load sample', 'warn'); }
+    finally { setConverting(null); }
+  };
+  const openFile = () => pickFiles('open');
 
   // ── annotation ops ──
   const beginEdit = useCallback(() => record(), [pages, annotations, docName, isProtected, password]);
@@ -2019,33 +2131,66 @@ function App() {
   };
 
   // ── merge / split / protect / export ──
-  const mergeFiles = () => {
-    const startIdx = pages.length;
-    startConvert([{ name: 'Addendum-B.docx', icon: 'word' }, { name: 'Cover-letter.png', icon: 'image' }], () => {
-      record();
-      setPages((p) => [...p, { id: 'p' + Date.now(), type: 'body-2', rotation: 0 }, { id: 'p' + (Date.now() + 1), type: 'cover', rotation: 0 }]);
-      markSaving(); setLeftTab('pages'); setCurrentIndex(startIdx); setScrollToken((x) => x + 1);
-      toast('2 files merged', 'success', 'Jumped to the new pages');
-    });
+  const mergeFiles = () => pickFiles('merge');
+
+  // real PDF build/download helpers
+  const refsOf = (arr) => arr.map((p) => ({ docId: p.docId, srcIndex: p.srcIndex, rotation: p.rotation || 0 }));
+  const idsOf = (arr) => arr.map((p) => p.id);
+  const downloadBytes = (bytes, name) => {
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = /\.pdf$/i.test(name) ? name : name + '.pdf';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
   };
-  const doSplit = () => {
+
+  const doSplit = async () => {
     let chosen;
     if (splitSel.length > 0) chosen = pages.filter((p) => splitSel.includes(p.id));
     else { const a = Math.min(splitFrom, splitTo), b = Math.max(splitFrom, splitTo); chosen = pages.slice(a - 1, b); }
     if (!chosen.length) return;
     const base = docName.replace(/\.pdf$/i, '');
     const ann = {}; chosen.forEach((p) => { if (annotations[p.id]) ann[p.id] = annotations[p.id]; });
-    setSplitResult({ name: `${base} — extract (${chosen.length} ${chosen.length > 1 ? 'pages' : 'page'}).pdf`, pages: chosen.map((p) => ({ ...p })), annotations: ann });
+    const name = `${base} — extract (${chosen.length} ${chosen.length > 1 ? 'pages' : 'page'}).pdf`;
+    try {
+      const bytes = await engine.buildPdf(refsOf(chosen), ann, idsOf(chosen));
+      setSplitResult({ name, pages: chosen.map((p) => ({ ...p })), annotations: ann, bytes });
+    } catch (e) { console.warn(e); toast('Split failed', 'warn'); }
   };
-  const splitDownload = (name) => { addFile({ kind: 'split', name, pages: splitResult.pages, annotations: splitResult.annotations }); toast('PDF downloaded', 'success', name); setSplitResult(null); setSplitSel([]); };
-  const splitOpen = (name) => { snapshotWorking(); addFile({ kind: 'split', name, pages: splitResult.pages, annotations: splitResult.annotations }); doLoad(splitResult.pages.map((p) => ({ ...p })), name, splitResult.annotations); setSplitResult(null); setSplitSel([]); setTool('select'); toast('Opened split document', 'success', name); };
+  const splitDownload = (name) => {
+    downloadBytes(splitResult.bytes, name);
+    addFile({ kind: 'split', name, bytes: splitResult.bytes, pageCount: splitResult.pages.length });
+    toast('PDF downloaded', 'success', name); setSplitResult(null); setSplitSel([]);
+  };
+  const splitOpen = async (name) => {
+    snapshotWorking();
+    addFile({ kind: 'split', name, bytes: splitResult.bytes, pageCount: splitResult.pages.length });
+    await loadBytes(splitResult.bytes, name);
+    setSplitResult(null); setSplitSel([]); setTool('select');
+  };
   const applyProtect = () => {
     record(); setIsProtected(true); setPassword(pw); setProtectOpen(false); setPw(''); setPw2('');
-    toast('Document protected', 'success', 'Password and permissions applied');
+    toast('Document protected', 'success', 'Will be encrypted on export');
   };
   const removeProtect = () => { record(); setIsProtected(false); setPassword(''); setProtectOpen(false); toast('Protection removed', 'info'); };
-  const exportPdf = () => { markSaving(); addFile({ kind: 'export', name: docName, pages, annotations }); toast('PDF exported', 'success', isProtected ? 'Encrypted · added to Files' : 'Downloaded · added to Files'); };
-  const save = () => { markSaving(); setTimeout(() => toast('All changes saved', 'success'), 120); };
+  const exportPdf = async () => {
+    markSaving();
+    try {
+      const bytes = await engine.exportPdf(refsOf(pages), annotations, idsOf(pages), { password: isProtected ? password : undefined, perms });
+      downloadBytes(bytes, docName);
+      addFile({ kind: 'export', name: docName, bytes, pageCount: pages.length });
+      toast('PDF exported', 'success', isProtected ? 'Encrypted · downloaded' : 'Downloaded');
+    } catch (e) { console.warn(e); toast('Export failed', 'warn'); }
+  };
+  const save = async () => {
+    markSaving();
+    try {
+      const bytes = await engine.buildPdf(refsOf(pages), annotations, idsOf(pages));
+      addFile({ id: 'working:' + docName, kind: 'document', name: docName, bytes, pageCount: pages.length, annotations });
+      toast('All changes saved', 'success', 'Stored on this device');
+    } catch (e) { console.warn(e); toast('Save failed', 'warn'); }
+  };
 
   // ── tool selection ──
   const pickTool = (id) => {
@@ -2083,12 +2228,22 @@ function App() {
   // recompute matches when query / options / page order change
   useEffect(() => {
     if (!loaded || !searchOpen || !searchQuery.trim()) { setMatches([]); setCurrentMatch(-1); return; }
-    const id = setTimeout(() => {
-      const m = collectMatches(searchQuery, matchCase);
+    let cancelled = false;
+    const id = setTimeout(async () => {
+      const m = await engine.searchPages(pages, searchQuery, matchCase).catch(() => []);
+      if (cancelled) return;
       setMatches(m); setCurrentMatch(m.length ? 0 : -1);
-    }, 40);
-    return () => clearTimeout(id);
-  }, [searchQuery, matchCase, searchOpen, loaded, pages, zoom]);
+    }, 80);
+    return () => { cancelled = true; clearTimeout(id); };
+  }, [searchQuery, matchCase, searchOpen, loaded, pages]);
+
+  // rebuild the TOC whenever the page set/order changes
+  useEffect(() => {
+    if (!loaded) { setToc({ nodes: [], generated: true }); return; }
+    let cancelled = false;
+    engine.buildToc(pages).then((t) => { if (!cancelled) setToc(t); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [loaded, pages]);
 
   // scroll the current match into view
   useEffect(() => {
@@ -2163,6 +2318,10 @@ function App() {
     <div className={appClass} style={rootStyle}>
       {t.density === 'compact' && <style>{DENSE_CSS}</style>}
 
+      {/* hidden picker for Open / Browse / Merge */}
+      <input ref={fileInputRef} type="file" accept="application/pdf,.pdf,image/png,image/jpeg,.png,.jpg,.jpeg" multiple={false}
+        style={{ display: 'none' }} onChange={(e) => { const f = e.target.files && e.target.files[0]; processFile(f, pickMode.current); }} />
+
       <TopBar
         docName={docName} onRename={(v) => { record(); setDocName(v); markSaving(); }}
         isProtected={isProtected} saveStatus={saveStatus} hasDoc={loaded}
@@ -2176,7 +2335,7 @@ function App() {
         {loaded && thumbsOpen && (
           <ThumbStrip pages={pages} currentIndex={currentIndex} splitSel={splitSel} tool={tool}
             annotations={annotations} onSelect={onThumbSelect} onReorder={reorder} onMenu={openThumbMenu}
-            tab={leftTab} onTab={setLeftTab} onTocNav={navToPage}
+            tab={leftTab} onTab={setLeftTab} onTocNav={navToPage} toc={toc.nodes} tocGenerated={toc.generated}
             onCollapse={() => setThumbsOpen(false)} />
         )}
 
@@ -2185,7 +2344,7 @@ function App() {
             <EmptyState onLoadSample={loadSample} onBrowse={openFile} dragOver={dragOver}
               onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
               onDragLeave={() => setDragOver(false)}
-              onDrop={(e) => { e.preventDefault(); setDragOver(false); loadSample(); }} />
+              onDrop={(e) => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) processFile(f, 'open'); }} />
           )}
           {converting && <Converting files={converting} />}
           {loaded && !converting && searchOpen && (
@@ -2248,6 +2407,22 @@ function App() {
           <button className="menu-item danger" onClick={() => { const idx = thumbMenu.index; setThumbMenu(null); deletePage(idx); }} disabled={pages.length <= 1}><Icon name="trash" size={16} /> Delete page</button>
         </Popover>
       )}
+
+      {/* unlock (encrypted upload) modal */}
+      {unlock && ReactDOM.createPortal(
+        <div className="scrim" onMouseDown={(e) => e.target === e.currentTarget && setUnlock(null)}>
+          <div className="modal" style={{ width: 'min(420px,92vw)' }}>
+            <div className="modal-hd"><div><h3>Password required</h3><p>“{unlock.name}” is encrypted. Enter its password to open.</p></div></div>
+            <div className="modal-body">
+              <input className="input" type="password" autoFocus placeholder="Document password" value={unlockPw}
+                onChange={(e) => setUnlockPw(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') doUnlock(); }} />
+            </div>
+            <div className="modal-foot">
+              <button className="btn ghost" onClick={() => { setUnlock(null); setUnlockPw(''); }}>Cancel</button>
+              <button className="btn primary" onClick={doUnlock} disabled={!unlockPw}>Unlock</button>
+            </div>
+          </div>
+        </div>, document.body)}
 
       {/* signature modal */}
       {sigModal && <SignatureModal onClose={() => setSigModal(false)} onSave={onSaveSig} />}
