@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Newsreader, JetBrains_Mono } from "next/font/google";
 import { GeistSans } from "geist/font/sans";
 import Script from "next/script";
-import "./globals.css";
+import "../globals.css";
 import { ThemeProvider, themeInitScript } from "@/components/ThemeProvider";
 import { Atmosphere } from "@/components/Atmosphere";
 import { SiteChrome } from "@/components/SiteChrome";

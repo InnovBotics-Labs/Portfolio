@@ -55,7 +55,7 @@ export const appStore = {
     {
       label: "Web Tools",
       apps: [
-        { id: "appicon-pdf", name: "PDF Editor", href: "https://portfolio-yie0.onrender.com/pdf-editor", icon: "/apps/icons/pdf.svg", h: 25 },
+        { id: "appicon-pdf", name: "PDF Editor", href: "/pdf-editor", icon: "/apps/icons/pdf.svg", h: 25 },
         { id: "appicon-json", name: "JSON Viewer", href: "/apps/json-viewer.html", icon: "/apps/icons/json.svg", h: 70 },
         { id: "appicon-conv", name: "Data Converter", href: "https://portfolio-yie0.onrender.com/data-converter", icon: "/apps/icons/conv.svg", h: 190 },
       ],
