@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c8cff"></stop>
+      <stop offset="1" stop-color="#5b4ae0"></stop>
+    </linearGradient>
+    <linearGradient id="chip" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef1ff"></stop>
+      <stop offset="1" stop-color="#c7ceff"></stop>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" fill="url(#bg)"></rect>
+
+  
+  <g>
+    <rect x="28" y="74" width="64" height="26" rx="5" fill="url(#chip)"></rect>
+    
+    <g fill="#5b4ae0" opacity="0.85">
+      <rect x="34" y="100" width="4" height="6" rx="1"></rect>
+      <rect x="42" y="100" width="4" height="6" rx="1"></rect>
+      <rect x="50" y="100" width="4" height="6" rx="1"></rect>
+      <rect x="58" y="100" width="4" height="6" rx="1"></rect>
+      <rect x="66" y="100" width="4" height="6" rx="1"></rect>
+      <rect x="74" y="100" width="4" height="6" rx="1"></rect>
+      <rect x="82" y="100" width="4" height="6" rx="1"></rect>
+    </g>
+    
+    <path d="M37 87h10v-5h9" fill="none" stroke="#7c8cff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"></path>
+    <circle cx="80" cy="82" r="2.4" fill="#7c8cff" opacity="0.7"></circle>
+    <circle cx="80" cy="92" r="2.4" fill="#7c8cff" opacity="0.7"></circle>
+  </g>
+
+  
+  <g>
+    <path d="M60 70c-6-5-15-6-23-4V40c8-2 17-1 23 4 6-5 15-6 23-4v26c-8-2-17-1-23 4z" fill="#ffffff"></path>
+    <path d="M60 70V44" stroke="#c7ceff" stroke-width="2.4" stroke-linecap="round"></path>
+    <g stroke="#a9b2ff" stroke-width="1.8" stroke-linecap="round" opacity="0.9">
+      <path d="M43 47h11"></path>
+      <path d="M43 53h11"></path>
+      <path d="M66 47h11"></path>
+      <path d="M66 53h11"></path>
+    </g>
+  </g>
+
+  
+  <g transform="translate(60 30)">
+    <path d="M-13 4c-5 0-8-4-7-9 0-3 2-5 5-6 0-4 4-7 8-6 2-3 7-3 9 0 4-1 8 2 8 6 3 1 5 3 5 6 1 5-2 9-7 9z" fill="#ffffff"></path>
+    <path d="M0 -11v15" fill="none" stroke="#7c8cff" stroke-width="1.8" stroke-linecap="round" opacity="0.75"></path>
+    <path d="M-6 -7c-2 2-2 5 0 7M6 -7c2 2 2 5 0 7M-3 0c0 2-2 3-4 3M3 0c0 2 2 3 4 3" fill="none" stroke="#7c8cff" stroke-width="1.6" stroke-linecap="round" opacity="0.75"></path>
+  </g>
+</svg>
