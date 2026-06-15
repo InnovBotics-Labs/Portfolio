@@ -5,7 +5,7 @@
 # Usage: Render dashboard → New → Blueprint → point at this repo.
 services:
   - type: web
-    name: prabhu-portfolio
+    name: prabhukumar-sivamoorthy
     runtime: node
     plan: starter # free tier (512MB) often OOMs the Next build; starter is safer
     branch: dev/ver-1 # change to your deploy branch (e.g. Portfolio_AD) if needed
