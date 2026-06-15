@@ -85,6 +85,7 @@ export type Project = {
   href: string;
   external: boolean;
   placeholder: string;
+  image?: string;
   desc: string;
   tags: string[];
   link: { label: string; href?: string };
@@ -102,6 +103,7 @@ export const work = {
       href: "https://storage-ssd-rag.onrender.com",
       external: true,
       placeholder: "Storage-SSD Specs — product shot",
+      image: "/work/storage-ssd-specs.png",
       desc: "A retrieval-augmented assistant over the datacenter SSD specifications — built for both humans and AI agents, with an MCP server so agents can query the standards directly and cite the source.",
       tags: ["Python", "RAG", "MCP", "LangChain"],
       link: { label: "Open app", href: "https://storage-ssd-rag.onrender.com" },

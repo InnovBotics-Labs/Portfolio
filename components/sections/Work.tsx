@@ -14,6 +14,7 @@ function ProjectCard({ p, clone = false }: { p: Project; clone?: boolean }) {
           style={{ width: "100%", aspectRatio: "16 / 10" }}
           shape="rounded"
           radius="14"
+          src={p.image}
           placeholder={p.placeholder}
         ></image-slot>
       </a>
