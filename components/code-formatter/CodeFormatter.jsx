@@ -151,7 +151,7 @@ export default function JsonViewer() {
   const [collapsed, setCollapsed] = useState({});
   const [treeCollapsed, setTreeCollapsed] = useState(false);
   const [outCollapsed, setOutCollapsed] = useState(false);
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState("light");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
 
@@ -161,11 +161,7 @@ export default function JsonViewer() {
   const fileRef = useRef(null);
   const toastSeq = useRef(0);
 
-  /* ---- theme: OS default on mount, applied to <html data-theme> ---- */
-  useEffect(() => {
-    const light = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
-    setTheme(light ? "light" : "dark");
-  }, []);
+  /* ---- theme: defaults to light; user toggles in Settings ---- */
   useEffect(() => { document.documentElement.setAttribute("data-theme", theme); }, [theme]);
 
   /* ---- toasts ---- */

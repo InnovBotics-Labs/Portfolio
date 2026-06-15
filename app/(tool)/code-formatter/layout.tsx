@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "@/components/json-viewer/lattice.css";
+import "@/components/code-formatter/lattice.css";
 
 export const metadata: Metadata = {
   title: "Prabhu's Formatter — data tree explorer & converter",
@@ -10,11 +10,11 @@ export const metadata: Metadata = {
  * Isolated root layout for the JSON formatter — its own <html>/<body> and only
  * lattice.css, so its full-screen styles/theme can't reach the portfolio or the
  * pdf-editor (Next loads a route segment's CSS only for that segment).
- * `data-theme` starts dark; Settings reconciles to the OS preference on mount.
+ * Defaults to light; Settings can switch to dark.
  */
-export default function JsonViewerLayout({ children }: { children: React.ReactNode }) {
+export default function CodeFormatterLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme="dark" suppressHydrationWarning>
+    <html lang="en" data-theme="light" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />

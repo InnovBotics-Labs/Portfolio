@@ -22,7 +22,7 @@ const eslintConfig = defineConfig([
     // The PDF editor is a faithful port of a Claude Design prototype (one
     // bundled module preserving its original shared-scope structure). Relax
     // stylistic/hook lint rules that don't apply to vendored prototype code.
-    files: ["components/pdf-editor/**", "components/json-viewer/**"],
+    files: ["components/pdf-editor/**", "components/code-formatter/**"],
     rules: {
       "react/no-unescaped-entities": "off",
       "react-hooks/exhaustive-deps": "off",
