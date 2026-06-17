@@ -2,7 +2,8 @@
 
 A single-page personal portfolio (Staff Engineer @ SanDisk), ported from a
 [Claude Design](https://claude.ai/design) prototype ("Portfolio – Photo Hero")
-into a production Next.js app.
+into a production Next.js app. It also bundles two standalone browser tools —
+a PDF editor and a code formatter — under their own routes.
 
 **Stack:** Next.js (App Router) · TypeScript · Tailwind CSS v4 · Framer Motion.
 
@@ -17,23 +18,39 @@ npm run start    # serve the production build
 
 ## Structure
 
+The app uses two App Router **route groups**, each with its own root
+`<html>`/`<body>` layout so their CSS and design tokens stay isolated:
+`(site)` is the portfolio, `(tool)` holds standalone full-screen browser tools.
+
 ```
 app/
-  layout.tsx       root shell: fonts, theme init, Atmosphere, Nav/Portal, Footer, vendored scripts
-  page.tsx         section composition (Hero → Marquee → AppStore → Work → About → Experience → Contact)
-  globals.css      the design system, ported verbatim from the prototype (OKLCH tokens, 3 palettes × light/dark)
+  (site)/
+    layout.tsx     portfolio shell: fonts, pre-paint theme init, Atmosphere, SiteChrome (Nav/Portal), Footer, vendored scripts
+    page.tsx       section composition (Hero → Marquee → AppStore → Work → About → Experience → Contact)
+  (tool)/
+    pdf-editor/    full-screen PDF editor — annotate, reorder, split, merge, protect (client-only)
+    code-formatter/ full-screen code/data formatter (client-only)
+  globals.css      the design system, ported verbatim from the prototype (OKLCH tokens, 3 palettes × light/dark); loaded only by (site)
   api/image-slots  empty <image-slot> sidecar (served at /.image-slots.state.json via a rewrite)
 components/
   ThemeProvider    theme / palette / accent / grain / 3D-backdrop state + localStorage; drives window.BG3D
   Reveal           Framer Motion scroll-reveal wrapper (replaces the prototype's .reveal + IntersectionObserver)
+  SiteChrome       fixed chrome owning Nav + Portal modal open state
   Nav / Portal / Footer / BrandDot / Atmosphere
   sections/        Hero, Marquee, AppStore, Work, About, Experience, Contact
-lib/content.ts     all copy (edit content here, not in markup)
+  pdf-editor/      PDF editor UI + engine (pdfjs-dist render, pdf-lib edit, qpdf-wasm encrypt) — verbatim port
+  code-formatter/  code formatter UI + engine — verbatim port
+lib/content.ts     all portfolio copy (edit content here, not in markup)
 public/
   bg3d.js          3D particle backdrop — ported verbatim from the prototype
   image-slot.js    drag-drop image placeholder web component — ported verbatim
   apps/            App Store sub-pages + gradient icons
+  pdf-editor/      vendored PDF runtime assets (pdf.js worker, qpdf-wasm glue)
 ```
+
+The two tools live in `app/(tool)/` and are loaded with `dynamic(..., { ssr:
+false })` because they rely on browser APIs (`window`/`document`/canvas/
+clipboard) and must not run during SSR/prerender.
 
 ## Theming
 

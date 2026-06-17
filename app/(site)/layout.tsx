@@ -50,6 +50,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {/* Bespoke prototype scripts, ported verbatim. */}
         <Script src="/image-slot.js" strategy="afterInteractive" />
         <Script src="/bg3d.js" strategy="afterInteractive" />
+        <Script src="/hero-orbit.js" strategy="afterInteractive" />
       </body>
     </html>
   );
