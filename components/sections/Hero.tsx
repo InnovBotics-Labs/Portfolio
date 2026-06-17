@@ -1,14 +1,16 @@
 import { hero } from "@/lib/content";
 import { Reveal } from "../Reveal";
+import { HeroOrbit } from "./HeroOrbit";
+import { Marquee } from "./Marquee";
 
-/** Split-screen "Photo Hero": copy on the left, framed photo slot on the right. */
+/** Full-bleed hero: copy on the left, 3D orbiting SSD on the right, marquee pinned to the bottom. */
 export function Hero() {
   return (
     <section className="shero" id="hero">
       <div className="shero__text">
         <Reveal as="p" className="shero__slogan" d={0}>
           <span className="status__dot"></span>
-          {hero.slogan}
+          Staff Engineer @ <strong className="shero__slogan-em">SanDisk</strong>
         </Reveal>
         <h1 className="shero__title">
           <Reveal as="span" d={1}>
@@ -42,31 +44,13 @@ export function Hero() {
             </div>
           ))}
         </Reveal>
-        <Reveal as="div" className="shero__stack" d={6}>
-          <span className="shero__stack-k">{hero.stackLabel}</span>
-          <ul className="shero__chips">
-            {hero.stack.map((s) => (
-              <li key={s}>{s}</li>
-            ))}
-          </ul>
-        </Reveal>
       </div>
-      <Reveal as="div" className="shero__media" d={2}>
-        <div className="shero__frame">
-          <image-slot
-            id="hero-portrait"
-            style={{ width: "100%", height: "100%" }}
-            shape="rounded"
-            radius="20"
-            placeholder="Drop your photo here"
-          ></image-slot>
-        </div>
-        <span className="shero__badge">
-          <span className="status__dot"></span>
-          {hero.badge}
-        </span>
-        <span className="shero__tag">{hero.tag}</span>
+
+      <Reveal as="div" className="hero3d" d={3} ariaHidden>
+        <HeroOrbit />
       </Reveal>
+
+      <Marquee variant="hero" />
     </section>
   );
 }

@@ -28,19 +28,51 @@ export const hero = {
     { label: "View selected work", href: "#work", arrow: "→", variant: "primary" as const },
     { label: "Download résumé", href: "/resume.pdf", arrow: "↓", variant: "ghost" as const, download: true },
   ],
-  meta: [
-    { dt: "Based in", dd: "Milpitas, California · USA" },
-    { dt: "Focus", dd: "Storage · Firmware · AI" },
-  ],
-  stackLabel: "Core stack",
-  stack: ["Python", "NVMe Datacenter SSDs", "LangChain", "LangGraph", "CrewAI", "LlamaIndex", "Llama Factory"],
-  badge: "Open to senior & staff roles",
-  tag: "PS — 2026",
+  // Location now lives in the Contact section; only Focus shows in the hero strip.
+  meta: [{ dt: "Focus", dd: "Datacenter NVMe SSDs · Python · AI Apps / AI Infra" }],
 };
+
+/**
+ * The hero's right column: a 3D SanDisk SSD with the tech stack as satellites
+ * orbiting it. Labels are copy; the orbital geometry (r/a/s) and group color
+ * keys are design parameters, copied verbatim from the prototype markup and
+ * consumed by both HeroOrbit.tsx and public/hero-orbit.js.
+ */
+export const heroOrbit = {
+  ssd: {
+    brand: "SanDisk",
+    tier: "Datacenter",
+    model: "NVMe™ SSD · SN864 · U.2",
+    cap: { value: "512", unit: "TB" },
+    meta: ["PCIe 5.0 ×4", "SN PS·2026"],
+  },
+  // group → ring class suffix (--lang/--fw/--inf/--ml/--std) drives ring + dot color
+  satellites: [
+    { label: "Python", group: "lang", r: 96, a: 40, s: 0.42 },
+    { label: "LangChain", group: "fw", r: 135, a: 20, s: 0.34 },
+    { label: "LangGraph", group: "fw", r: 135, a: 200, s: 0.34 },
+    { label: "Ollama", group: "inf", r: 174, a: 115, s: 0.28 },
+    { label: "llama.cpp", group: "inf", r: 174, a: 295, s: 0.28 },
+    { label: "LlamaIndex", group: "ml", r: 214, a: 0, s: 0.22 },
+    { label: "Llama Factory", group: "ml", r: 214, a: 90, s: 0.22 },
+    { label: "PyTorch", group: "ml", r: 214, a: 180, s: 0.22 },
+    { label: "TensorFlow", group: "ml", r: 214, a: 270, s: 0.22 },
+    { label: "NVMe", group: "std", r: 256, a: 30, s: 0.17 },
+    { label: "PCIe", group: "std", r: 256, a: 150, s: 0.17 },
+    { label: "OCP", group: "std", r: 256, a: 270, s: 0.17 },
+  ],
+  legend: [
+    { group: "lang", label: "Language" },
+    { group: "fw", label: "Frameworks" },
+    { group: "inf", label: "Inference" },
+    { group: "ml", label: "RAG & Training" },
+    { group: "std", label: "Standards" },
+  ],
+} as const;
 
 export const marquee = [
   "NVMe Datacenter SSDs",
-  "Firmware Verification",
+  "Firmware Verification (and validation)",
   "AI Infrastructure",
   "AI Applications",
   "Multi-Agent Systems",
